@@ -1,0 +1,32 @@
+services:
+  - type: web
+    name: follow-up-radar-mcp
+    runtime: docker
+    plan: free
+    repo: https://github.com/DaymondGoulderHorobin/follow-up-radar-mcp
+    branch: main
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /healthz
+    autoDeployTrigger: checksPass
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: LOG_LEVEL
+        value: INFO
+      - key: FIXTURE_MODE
+        value: "true"
+      - key: FHIR_SYNTHETIC_BUNDLE_PATH
+        value: data/synthetic_patient_bundle.json
+      - key: HOST
+        value: 0.0.0.0
+      - key: PORT
+        value: "8000"
+      - key: MCP_TRANSPORT
+        value: streamable-http
+      - key: MCP_JSON_RESPONSE
+        value: "false"
+      - key: MCP_STATELESS_HTTP
+        value: "false"
+      - key: ALLOWED_ORIGINS
+        value: ""
