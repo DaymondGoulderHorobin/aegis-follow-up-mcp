@@ -1,0 +1,49 @@
+"""FHIR context parsing.
+
+The access token is carried in memory only and should not be logged.
+"""
+
+from __future__ import annotations
+
+from collections.abc import Mapping
+from dataclasses import dataclass
+
+FHIR_SERVER_HEADER = "x-fhir-server-url"
+FHIR_TOKEN_HEADER = "x-fhir-access-token"
+FHIR_PATIENT_HEADER = "x-patient-id"
+
+
+@dataclass(frozen=True)
+class FHIRContext:
+    server_url: str | None = None
+    access_token: str | None = None
+    patient_id: str | None = None
+    fixture_mode: bool = True
+
+    @property
+    def has_external_context(self) -> bool:
+        return not self.fixture_mode
+
+
+def parse_fhir_context(headers: Mapping[str, str] | None) -> FHIRContext:
+    """Parse Prompt Opinion/FHIR headers.
+
+    Fixture mode is used unless all required external FHIR headers are present.
+    """
+
+    normalized_headers = {
+        str(key).lower(): str(value)
+        for key, value in (headers or {}).items()
+        if value is not None
+    }
+    server_url = normalized_headers.get(FHIR_SERVER_HEADER)
+    access_token = normalized_headers.get(FHIR_TOKEN_HEADER)
+    patient_id = normalized_headers.get(FHIR_PATIENT_HEADER)
+    fixture_mode = not all([server_url, access_token, patient_id])
+
+    return FHIRContext(
+        server_url=server_url,
+        access_token=access_token,
+        patient_id=patient_id,
+        fixture_mode=fixture_mode,
+    )
