@@ -8,8 +8,8 @@ Clinical decision support only. For clinician review. Not a diagnosis or treatme
 
 - Project: Agents Assemble Prompt Opinion Hackathon
 - Protocol: MCP server first
-- Sprint 1 data mode: synthetic FHIR fixtures only
-- Target MCP endpoint: `/mcp`
+- Data mode: synthetic FHIR fixtures only
+- Target MCP endpoint: `/mcp/`
 - Health endpoints: `/healthz`, `/readyz`, `/version`
 
 ## Local Setup
@@ -55,9 +55,25 @@ docker build -t follow-up-radar-mcp .
 docker run --rm -p 8000:8000 follow-up-radar-mcp
 ```
 
+## Deployment
+
+Sprint 3 adds Render Blueprint configuration in `render.yaml`.
+
+Expected deployed MCP URL after provisioning:
+
+```text
+https://follow-up-radar-mcp.onrender.com/mcp/
+```
+
+Validate a deployed endpoint with:
+
+```bash
+python scripts/smoke_mcp.py --url https://follow-up-radar-mcp.onrender.com/mcp/
+```
+
 ## MCP Tool Notes
 
-Sprint 2 exposes these MCP tools:
+The server exposes these MCP tools:
 
 - `get_patient_snapshot`
 - `get_recent_observations`
@@ -75,7 +91,7 @@ For MCP Inspector and deployment guidance, see:
 
 ## Prompt Opinion Integration Notes
 
-Sprint 1 keeps the server MCP-first and deterministic. Sprint 2 should verify Prompt Opinion MCP transport compatibility, run MCP Inspector, deploy the server to a public HTTPS endpoint, and connect that endpoint inside Prompt Opinion.
+The server stays MCP-first and deterministic. Sprint 3 focuses on public HTTPS deployment and Prompt Opinion validation without adding an LLM layer.
 
 Expected FHIR context headers for future external mode:
 

@@ -34,7 +34,7 @@ def test_version() -> None:
 
     assert response.status_code == 200
     assert response.json()["project"] == "Follow-Up Radar MCP"
-    assert response.json()["version"] == "0.2.0"
+    assert response.json()["version"] == "0.3.0"
     assert response.json()["mcp_transport"] == "streamable-http"
 
 
