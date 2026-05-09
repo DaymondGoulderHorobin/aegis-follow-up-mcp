@@ -39,7 +39,7 @@ Then open:
 - `http://localhost:8000/healthz`
 - `http://localhost:8000/readyz`
 - `http://localhost:8000/version`
-- `http://localhost:8000/mcp`
+- `http://localhost:8000/mcp/`
 
 ## Test
 
@@ -57,7 +57,7 @@ docker run --rm -p 8000:8000 follow-up-radar-mcp
 
 ## MCP Tool Notes
 
-Sprint 1 exposes or scaffolds these MCP tools:
+Sprint 2 exposes these MCP tools:
 
 - `get_patient_snapshot`
 - `get_recent_observations`
@@ -66,6 +66,12 @@ Sprint 1 exposes or scaffolds these MCP tools:
 - `draft_clinician_note`
 
 The code registers these tools with FastMCP when the `fastmcp` package is installed. In local fixture-only test environments without FastMCP, `/mcp` returns tool metadata so the rest of the project remains testable.
+
+For MCP Inspector and deployment guidance, see:
+
+- `docs/mcp_inspector.md`
+- `docs/deployment.md`
+- `docs/prompt_opinion_setup.md`
 
 ## Prompt Opinion Integration Notes
 

@@ -20,6 +20,21 @@
     },
     {
       "resource": {
+        "resourceType": "Patient",
+        "id": "synthetic-patient-002",
+        "name": [
+          {
+            "use": "official",
+            "family": "Ngata",
+            "given": ["Jamie"]
+          }
+        ],
+        "gender": "male",
+        "birthDate": "1984-11-02"
+      }
+    },
+    {
+      "resource": {
         "resourceType": "Condition",
         "id": "condition-diabetes",
         "subject": {"reference": "Patient/synthetic-patient-001"},
@@ -56,12 +71,41 @@
     },
     {
       "resource": {
+        "resourceType": "Condition",
+        "id": "condition-hypertension-002",
+        "subject": {"reference": "Patient/synthetic-patient-002"},
+        "clinicalStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+              "code": "active"
+            }
+          ]
+        },
+        "code": {
+          "text": "Hypertension"
+        }
+      }
+    },
+    {
+      "resource": {
         "resourceType": "MedicationStatement",
         "id": "med-metformin",
         "subject": {"reference": "Patient/synthetic-patient-001"},
         "status": "active",
         "medicationCodeableConcept": {
           "text": "Metformin 500 mg tablet"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationStatement",
+        "id": "med-amlodipine-002",
+        "subject": {"reference": "Patient/synthetic-patient-002"},
+        "status": "active",
+        "medicationCodeableConcept": {
+          "text": "Amlodipine 5 mg tablet"
         }
       }
     },
@@ -79,6 +123,23 @@
         "period": {
           "start": "2026-04-12T09:00:00+12:00",
           "end": "2026-04-12T09:30:00+12:00"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "encounter-bp-check-002",
+        "status": "finished",
+        "subject": {"reference": "Patient/synthetic-patient-002"},
+        "type": [
+          {
+            "text": "Nurse blood pressure review"
+          }
+        ],
+        "period": {
+          "start": "2026-04-18T14:00:00+12:00",
+          "end": "2026-04-18T14:20:00+12:00"
         }
       }
     },
@@ -323,6 +384,84 @@
             }
           }
         ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-bp-systolic-002-2026-04-18",
+        "status": "final",
+        "subject": {"reference": "Patient/synthetic-patient-002"},
+        "effectiveDateTime": "2026-04-18T14:05:00+12:00",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "8480-6",
+              "display": "Systolic blood pressure"
+            }
+          ],
+          "text": "Systolic blood pressure"
+        },
+        "valueQuantity": {
+          "value": 132,
+          "unit": "mmHg",
+          "system": "http://unitsofmeasure.org",
+          "code": "mm[Hg]"
+        },
+        "referenceRange": [
+          {
+            "high": {
+              "value": 140,
+              "unit": "mmHg"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-bp-diastolic-002-2026-04-18",
+        "status": "final",
+        "subject": {"reference": "Patient/synthetic-patient-002"},
+        "effectiveDateTime": "2026-04-18T14:05:00+12:00",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "8462-4",
+              "display": "Diastolic blood pressure"
+            }
+          ],
+          "text": "Diastolic blood pressure"
+        },
+        "valueQuantity": {
+          "value": 84,
+          "unit": "mmHg",
+          "system": "http://unitsofmeasure.org",
+          "code": "mm[Hg]"
+        },
+        "referenceRange": [
+          {
+            "high": {
+              "value": 90,
+              "unit": "mmHg"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-malformed-no-value-002",
+        "status": "final",
+        "subject": {"reference": "Patient/synthetic-patient-002"},
+        "effectiveDateTime": "2026-04-18T14:10:00+12:00",
+        "code": {
+          "text": "Malformed synthetic observation without value"
+        }
       }
     },
     {

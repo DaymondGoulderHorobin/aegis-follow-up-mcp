@@ -20,6 +20,9 @@ def test_complete_fhir_context_disables_fixture_mode() -> None:
 
     assert context.fixture_mode is False
     assert context.has_external_context is True
+    assert context.patient_id == "patient-123"
+    assert "secret-token" not in repr(context)
+    assert context.safe_summary()["access_token"] == "[REDACTED]"
 
 
 def test_token_redaction() -> None:
@@ -32,3 +35,10 @@ def test_token_redaction() -> None:
 
     assert redacted["X-FHIR-Access-Token"] == "[REDACTED]"
     assert redacted["X-Patient-ID"] == "patient-123"
+
+
+def test_patient_id_header_can_drive_fixture_mode_without_external_context() -> None:
+    context = parse_fhir_context({"X-Patient-ID": "synthetic-patient-002"})
+
+    assert context.fixture_mode is True
+    assert context.patient_id == "synthetic-patient-002"

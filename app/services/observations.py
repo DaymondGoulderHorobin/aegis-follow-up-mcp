@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from app.fhir.fixtures import iter_resources, load_synthetic_bundle
+from app.fhir.fixtures import default_patient_id, iter_resources, load_synthetic_bundle
 from app.fhir.models import ObservationResult
 
 ABNORMAL_INTERPRETATIONS = {"H", "HH", "L", "LL", "A", "AA"}
@@ -15,10 +15,13 @@ def get_recent_observations(
     bundle: dict[str, Any] | None = None,
 ) -> list[ObservationResult]:
     source_bundle = bundle or load_synthetic_bundle()
+    requested_patient_id = patient_id or default_patient_id(source_bundle)
     observations = [
-        _normalize_observation(resource)
+        observation
         for resource in iter_resources("Observation", source_bundle)
-        if _matches_patient(resource, patient_id)
+        if _matches_patient(resource, requested_patient_id)
+        for observation in [_normalize_observation(resource)]
+        if observation is not None
     ]
     return sorted(observations, key=lambda item: item.effective_date, reverse=True)
 
@@ -29,18 +32,24 @@ def _matches_patient(resource: dict[str, Any], patient_id: str | None) -> bool:
     return resource.get("subject", {}).get("reference") == f"Patient/{patient_id}"
 
 
-def _normalize_observation(resource: dict[str, Any]) -> ObservationResult:
-    value_quantity = resource.get("valueQuantity", {})
+def _normalize_observation(resource: dict[str, Any]) -> ObservationResult | None:
+    value_quantity = resource.get("valueQuantity")
+    if not isinstance(value_quantity, dict):
+        return None
+    value = _to_float(value_quantity.get("value"))
+    if value is None:
+        return None
     reference_range = (resource.get("referenceRange") or [{}])[0]
+    if not isinstance(reference_range, dict):
+        reference_range = {}
     low = reference_range.get("low", {}).get("value")
     high = reference_range.get("high", {}).get("value")
     interpretation = _interpretation_code(resource)
-    value = float(value_quantity.get("value"))
-    reference_low = float(low) if low is not None else None
-    reference_high = float(high) if high is not None else None
+    reference_low = _to_float(low)
+    reference_high = _to_float(high)
 
     return ObservationResult(
-        id=resource["id"],
+        id=str(resource.get("id", "")),
         code=_code(resource),
         display=_display(resource),
         effective_date=resource.get("effectiveDateTime", ""),
@@ -51,6 +60,13 @@ def _normalize_observation(resource: dict[str, Any]) -> ObservationResult:
         reference_high=reference_high,
         abnormal=_is_abnormal(value, reference_low, reference_high, interpretation),
     )
+
+
+def _to_float(value: Any) -> float | None:
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
 
 
 def _code(resource: dict[str, Any]) -> str:

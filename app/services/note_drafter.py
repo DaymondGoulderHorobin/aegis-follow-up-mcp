@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from app.safety.disclaimers import CLINICIAN_REVIEW_DISCLAIMER
 from app.services.abnormal_results import find_unresolved_abnormal_results
 from app.services.patient_snapshot import get_patient_snapshot
 
@@ -11,7 +12,7 @@ def draft_clinician_note(patient_id: str | None = None) -> str:
     findings = find_unresolved_abnormal_results(patient_id=patient_id)
     if not findings:
         return (
-            f"For clinician review: Synthetic chart review for {patient.name} "
+            f"{CLINICIAN_REVIEW_DISCLAIMER} Synthetic chart review for {patient.name} "
             "did not identify unresolved abnormal results in the fixture data."
         )
 
@@ -19,7 +20,7 @@ def draft_clinician_note(patient_id: str | None = None) -> str:
         f"{finding.display} ({finding.severity})" for finding in findings
     )
     return (
-        f"For clinician review: Synthetic chart review for {patient.name} identified "
+        f"{CLINICIAN_REVIEW_DISCLAIMER} Synthetic chart review for {patient.name} identified "
         f"potentially unresolved abnormal result(s): {finding_lines}. "
         "Clinician may wish to verify whether follow-up is already documented and "
         "update the chart with their assessment and plan as appropriate."
