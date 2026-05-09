@@ -31,3 +31,21 @@ def iter_resources(
 
 def first_resource(resource_type: str, bundle: dict[str, Any] | None = None) -> dict[str, Any]:
     return next(iter_resources(resource_type, bundle), {})
+
+
+def find_resource_by_id(
+    resource_type: str,
+    resource_id: str | None,
+    bundle: dict[str, Any] | None = None,
+) -> dict[str, Any] | None:
+    if not resource_id:
+        return None
+    for resource in iter_resources(resource_type, bundle):
+        if resource.get("id") == resource_id:
+            return resource
+    return None
+
+
+def default_patient_id(bundle: dict[str, Any] | None = None) -> str | None:
+    patient = first_resource("Patient", bundle)
+    return patient.get("id") if patient else None

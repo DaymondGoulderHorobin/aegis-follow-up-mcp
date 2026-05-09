@@ -11,6 +11,7 @@ except ImportError:  # pragma: no cover - normal in lightweight local test envs
     FastMCP = None
 
 from app.config import settings
+from app.fhir.context import resolve_patient_id
 from app.services.abnormal_results import find_unresolved_abnormal_results as find_results
 from app.services.brief_generator import generate_follow_up_brief as build_brief
 from app.services.note_drafter import draft_clinician_note as build_note
@@ -52,35 +53,40 @@ def _register_tool(func: Callable[..., Any]) -> Callable[..., Any]:
 def get_patient_snapshot(patient_id: str | None = None) -> dict[str, Any]:
     """Return synthetic patient demographics, conditions, medications, and encounters."""
 
-    return build_snapshot(patient_id=patient_id).model_dump()
+    return build_snapshot(patient_id=resolve_patient_id(patient_id)).model_dump()
 
 
 @_register_tool
 def get_recent_observations(patient_id: str | None = None) -> list[dict[str, Any]]:
     """Return recent synthetic observations and lab results."""
 
-    return [observation.model_dump() for observation in build_observations(patient_id=patient_id)]
+    resolved_patient_id = resolve_patient_id(patient_id)
+    return [
+        observation.model_dump()
+        for observation in build_observations(patient_id=resolved_patient_id)
+    ]
 
 
 @_register_tool
 def find_unresolved_abnormal_results(patient_id: str | None = None) -> list[dict[str, Any]]:
     """Flag abnormal results with no obvious follow-up evidence in synthetic data."""
 
-    return [finding.model_dump() for finding in find_results(patient_id=patient_id)]
+    resolved_patient_id = resolve_patient_id(patient_id)
+    return [finding.model_dump() for finding in find_results(patient_id=resolved_patient_id)]
 
 
 @_register_tool
 def generate_follow_up_brief(patient_id: str | None = None) -> dict[str, Any]:
     """Generate a deterministic clinician-facing follow-up brief."""
 
-    return build_brief(patient_id=patient_id)
+    return build_brief(patient_id=resolve_patient_id(patient_id))
 
 
 @_register_tool
 def draft_clinician_note(patient_id: str | None = None) -> dict[str, str]:
     """Draft a short note for clinician review."""
 
-    return {"draft_note": build_note(patient_id=patient_id)}
+    return {"draft_note": build_note(patient_id=resolve_patient_id(patient_id))}
 
 
 def get_registered_tool_names() -> list[str]:
@@ -98,6 +104,13 @@ def get_mcp_asgi_app() -> Any | None:
         if not callable(method):
             continue
         try:
+            if method_name == "http_app":
+                return method(
+                    path="/",
+                    transport=settings.mcp_transport,
+                    json_response=settings.mcp_json_response,
+                    stateless_http=settings.mcp_stateless_http,
+                )
             return method(path="/")
         except TypeError:
             return method()

@@ -34,7 +34,8 @@ def test_version() -> None:
 
     assert response.status_code == 200
     assert response.json()["project"] == "Follow-Up Radar MCP"
-    assert response.json()["version"] == "0.1.0"
+    assert response.json()["version"] == "0.2.0"
+    assert response.json()["mcp_transport"] == "streamable-http"
 
 
 def test_mcp_endpoint_is_available_and_tools_are_registered() -> None:

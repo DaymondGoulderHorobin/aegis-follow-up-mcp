@@ -22,4 +22,5 @@ def test_draft_note_avoids_diagnostic_or_directive_phrasing() -> None:
         "should start",
     ]
     assert "for clinician review" in note
+    assert CLINICIAN_REVIEW_DISCLAIMER.lower() in note
     assert all(phrase not in note for phrase in forbidden_phrases)

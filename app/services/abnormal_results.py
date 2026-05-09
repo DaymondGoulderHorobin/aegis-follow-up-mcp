@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any
 
-from app.fhir.fixtures import iter_resources, load_synthetic_bundle
+from app.fhir.fixtures import default_patient_id, iter_resources, load_synthetic_bundle
 from app.fhir.models import AbnormalFinding
 from app.services.observations import get_recent_observations
 
@@ -20,13 +20,21 @@ FOLLOW_UP_RESOURCE_TYPES = {
 }
 
 
-def find_unresolved_abnormal_results(patient_id: str | None = None) -> list[AbnormalFinding]:
-    bundle = load_synthetic_bundle()
+def find_unresolved_abnormal_results(
+    patient_id: str | None = None,
+    bundle: dict[str, Any] | None = None,
+) -> list[AbnormalFinding]:
+    source_bundle = bundle or load_synthetic_bundle()
+    requested_patient_id = patient_id or default_patient_id(source_bundle)
     findings: list[AbnormalFinding] = []
-    for observation in get_recent_observations(patient_id=patient_id, bundle=bundle):
+    observations = get_recent_observations(
+        patient_id=requested_patient_id,
+        bundle=source_bundle,
+    )
+    for observation in observations:
         if not observation.abnormal:
             continue
-        if _has_follow_up_evidence(observation.id, observation.effective_date, bundle):
+        if _has_follow_up_evidence(observation.id, observation.effective_date, source_bundle):
             continue
 
         findings.append(
@@ -63,6 +71,8 @@ def _has_follow_up_evidence(
     bundle: dict[str, Any],
 ) -> bool:
     observed_at = _parse_date(observation_date)
+    if observed_at is None:
+        return False
     for resource in iter_resources(bundle=bundle):
         if resource.get("resourceType") not in FOLLOW_UP_RESOURCE_TYPES:
             continue
@@ -76,28 +86,80 @@ def _has_follow_up_evidence(
 
 def _references_observation(resource: dict[str, Any], observation_id: str) -> bool:
     expected_reference = f"Observation/{observation_id}"
-    for reference in resource.get("reasonReference", []):
-        if reference.get("reference") == expected_reference:
-            return True
-    return False
+    return expected_reference in _extract_references(resource)
 
 
-def _resource_date(resource: dict[str, Any]) -> datetime | None:
-    for key in (
-        "authoredOn",
-        "occurrenceDateTime",
-        "effectiveDateTime",
-        "issued",
-        "created",
-    ):
-        value = resource.get(key)
-        if value:
-            return _parse_date(value)
+def _extract_references(value: Any) -> set[str]:
+    references: set[str] = set()
+    if isinstance(value, dict):
+        reference = value.get("reference")
+        if isinstance(reference, str):
+            references.add(reference)
+        for child in value.values():
+            references.update(_extract_references(child))
+    elif isinstance(value, list):
+        for item in value:
+            references.update(_extract_references(item))
+    return references
+
+
+def _date_from_period(resource: dict[str, Any]) -> str | None:
+    period = resource.get("period")
+    if isinstance(period, dict):
+        start = period.get("start")
+        if isinstance(start, str):
+            return start
     return None
 
 
-def _parse_date(value: str) -> datetime:
-    return datetime.fromisoformat(value.replace("Z", "+00:00"))
+def _first_string(*values: Any) -> str | None:
+    for value in values:
+        if isinstance(value, str) and value:
+            return value
+    return None
+
+
+def _date_from_nested(resource: dict[str, Any]) -> str | None:
+    occurrence = resource.get("occurrencePeriod")
+    if isinstance(occurrence, dict):
+        start = occurrence.get("start")
+        if isinstance(start, str):
+            return start
+    timing = resource.get("occurrenceTiming")
+    if isinstance(timing, dict):
+        event = timing.get("event")
+        if isinstance(event, list):
+            for item in event:
+                if isinstance(item, str):
+                    return item
+    return None
+
+
+def _safe_parse_date(value: str | None) -> datetime | None:
+    if not value:
+        return None
+    try:
+        return datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+
+
+def _resource_date(resource: dict[str, Any]) -> datetime | None:
+    value = _first_string(
+        resource.get("authoredOn"),
+        resource.get("occurrenceDateTime"),
+        _date_from_nested(resource),
+        resource.get("effectiveDateTime"),
+        resource.get("issued"),
+        resource.get("created"),
+        resource.get("performedDateTime"),
+        _date_from_period(resource),
+    )
+    return _safe_parse_date(value)
+
+
+def _parse_date(value: str) -> datetime | None:
+    return _safe_parse_date(value)
 
 
 def _severity_for_observation(
