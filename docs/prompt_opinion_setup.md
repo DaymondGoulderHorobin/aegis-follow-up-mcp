@@ -19,13 +19,15 @@ The final URL should be replaced with the actual Render service URL if Render as
    ```
 3. Open Prompt Opinion and add the MCP server URL.
 4. Continue through initialization so Prompt Opinion can inspect capabilities.
-5. Confirm tool discovery lists all five tools.
+5. Confirm tool discovery lists all six tools.
 6. Confirm the FHIR-context trust or extension toggle appears.
 7. Confirm all requested scopes are optional.
 8. Invoke `get_patient_snapshot` for `synthetic-patient-001`.
 9. Invoke `find_unresolved_abnormal_results` for `synthetic-patient-001`.
 10. Invoke `generate_follow_up_brief` for `synthetic-patient-001`.
-11. Record any initialization, trust-toggle, header-forwarding, or timeout notes for demo rehearsal.
+11. Invoke `assess_follow_up_priority` for `synthetic-patient-003`.
+12. Invoke `assess_follow_up_priority` for `synthetic-patient-004`.
+13. Record any initialization, trust-toggle, header-forwarding, or timeout notes for demo rehearsal.
 
 ## FHIR-Context Extension
 
@@ -43,7 +45,7 @@ Requested scopes:
 - `patient/MedicationStatement.rs`
 - `patient/Encounter.rs`
 
-All scopes are optional by default. Users can leave the extension disabled and still use the deterministic synthetic demo. The server does not request `offline_access`, does not receive refresh tokens, and does not perform real external FHIR reads in Sprint 4.
+All scopes are optional by default. Users can leave the extension disabled and still use the deterministic synthetic demo. The server does not request `offline_access`, does not receive refresh tokens, and does not perform real external FHIR reads.
 
 ## Expected Tools
 
@@ -54,10 +56,16 @@ Prompt Opinion should discover:
 - `find_unresolved_abnormal_results`
 - `generate_follow_up_brief`
 - `draft_clinician_note`
+- `assess_follow_up_priority`
 
 ## Synthetic Fixture Mode
 
-Sprint 4 defaults to synthetic fixture mode. If Prompt Opinion does not pass FHIR headers during early testing, the server still works against `synthetic-patient-001`.
+Sprint 5 defaults to synthetic fixture mode. If Prompt Opinion does not pass FHIR headers during testing, the server still works against these fixture patients:
+
+- `synthetic-patient-001`: unresolved A1c and LDL.
+- `synthetic-patient-003`: high potassium priority case.
+- `synthetic-patient-004`: clean chart case.
+- `synthetic-patient-005`: abnormal A1c suppressed by follow-up evidence.
 
 If a user trusts the server and authorizes FHIR context, Prompt Opinion may pass these headers. The server accepts them case-insensitively:
 
@@ -75,11 +83,21 @@ Check synthetic-patient-001 for unresolved abnormal results and draft a follow-u
 
 Expected behavior: unresolved A1c and LDL findings appear with evidence and clinician review actions. Potassium is not returned as unresolved because follow-up evidence exists in the synthetic fixture.
 
+## BYO Agent Safety Instructions
+
+Use a Prompt Opinion BYO agent instruction such as:
+
+```text
+Use Follow-Up Radar MCP tool output as clinical decision support only. Do not add diagnosis, prescribing, treatment-plan, therapy recommendation, medication-adjustment, or urgency instructions beyond the deterministic MCP output. Preserve the disclaimer and ask for clinician review.
+```
+
+The server itself validates clinician-facing text for disallowed recommendation phrases, but the BYO agent should still be instructed not to embellish tool results.
+
 ## Troubleshooting
 
 - Failed initialization: confirm the URL ends in `/mcp/` and the server is awake.
 - Missing FHIR-context toggle: run the smoke script and confirm initialize capabilities include `ai.promptopinion/fhir-context`.
-- Missing tools: open `/version` and verify the deployed code is version `0.4.0`.
+- Missing tools: open `/version` and verify the deployed code is version `0.5.0`.
 - Timeout: warm the deployment with `/healthz`, then retry initialization.
 - Plain `GET /mcp` returns `406`: use MCP Inspector or Prompt Opinion instead of a browser GET.
 - Wrong patient: pass `patient_id` as a tool argument, or pass `X-Patient-ID` when the client supports custom headers.

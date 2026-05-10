@@ -18,6 +18,7 @@ from app.prompt_opinion.fhir_context_extension import (
 )
 from app.services.abnormal_results import find_unresolved_abnormal_results as find_results
 from app.services.brief_generator import generate_follow_up_brief as build_brief
+from app.services.follow_up_priority import assess_follow_up_priority as build_priority
 from app.services.note_drafter import draft_clinician_note as build_note
 from app.services.observations import get_recent_observations as build_observations
 from app.services.patient_snapshot import get_patient_snapshot as build_snapshot
@@ -94,6 +95,13 @@ def draft_clinician_note(patient_id: str | None = None) -> dict[str, str]:
     """Draft a short note for clinician review."""
 
     return {"draft_note": build_note(patient_id=resolve_patient_id(patient_id))}
+
+
+@_register_tool
+def assess_follow_up_priority(patient_id: str | None = None) -> dict[str, Any]:
+    """Assess deterministic clinician-review priority for unresolved abnormalities."""
+
+    return build_priority(patient_id=resolve_patient_id(patient_id))
 
 
 def get_registered_tool_names() -> list[str]:
