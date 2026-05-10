@@ -11,7 +11,7 @@ Clinical decision support only. For clinician review. Not a diagnosis or treatme
 - Data mode: synthetic FHIR fixtures only
 - Target MCP endpoint: `/mcp/`
 - Health endpoints: `/healthz`, `/readyz`, `/version`
-- Current version: `0.6.0`
+- Current version: `0.7.0`
 
 ## Local Setup
 
@@ -80,6 +80,7 @@ The server exposes these MCP tools:
 - `get_recent_observations`
 - `find_unresolved_abnormal_results`
 - `generate_follow_up_brief`
+- `generate_ai_follow_up_brief`
 - `draft_clinician_note`
 - `assess_follow_up_priority`
 - `list_rule_profiles`
@@ -107,6 +108,14 @@ Sprint 6 adds a product workflow layer:
 - simulated clinician review state with no EHR write
 - an EHR integration summary for FHIR-in and clinician-reviewed task or note out
 
+Sprint 7 adds a controlled AI narrative layer:
+
+- deterministic findings, priorities, audit counts, and task context remain the source of truth
+- optional Gemini synthesis can create a concise clinician-review narrative
+- disabled or missing LLM configuration returns deterministic fallback output
+- unsafe model wording is blocked and replaced with deterministic fallback text
+- the AI response always includes structured evidence beside the narrative
+
 For MCP Inspector and deployment guidance, see:
 
 - `docs/mcp_inspector.md`
@@ -116,7 +125,8 @@ For MCP Inspector and deployment guidance, see:
 
 ## Prompt Opinion Integration Notes
 
-The server stays MCP-first and deterministic. Sprint 4 advertises Prompt Opinion's FHIR-context MCP extension during initialize:
+The server stays MCP-first and deterministic at its clinical decision boundary. Sprint 4
+advertises Prompt Opinion's FHIR-context MCP extension during initialize:
 
 ```text
 capabilities.extensions.ai.promptopinion/fhir-context
@@ -130,7 +140,9 @@ Requested SMART scopes are optional by default:
 - `patient/MedicationStatement.rs`
 - `patient/Encounter.rs`
 
-The server does not request `offline_access`, does not handle refresh tokens, does not fetch real FHIR data, and does not add an LLM layer.
+The server does not request `offline_access`, does not handle refresh tokens, and does
+not fetch real FHIR data. The optional Sprint 7 LLM path only synthesizes narrative
+from deterministic structured output.
 
 If a Prompt Opinion user trusts the server and authorizes FHIR context, these headers may be sent to tool calls:
 
@@ -152,3 +164,33 @@ The included fixture data is synthetic and intentionally small for a reliable ha
 Do not add real patient names, addresses, phone numbers, emails, identifiers, access tokens, or refresh tokens to this repository.
 
 All generated summaries are framed as clinician support. The app does not diagnose, prescribe, or replace clinical judgement. Reusable safety validation flags disallowed recommendation phrases before clinician-facing payloads are returned.
+
+## Hackathon Scoring Notes
+
+### AI Factor
+
+Follow-Up Radar combines Prompt Opinion MCP orchestration with an internal,
+guardrailed narrative layer. The deterministic services decide what was found, what
+was suppressed, and which priority tier applies. The optional LLM only summarizes
+that structured evidence for clinician review, and fallback mode keeps the demo
+working without an API key.
+
+### Potential Impact
+
+The product targets a common primary-care operations gap: abnormal results that may
+need documented follow-up. The workflow is designed to surface a review queue,
+show audit evidence, and support clinician confirmation before any downstream task
+or note is created.
+
+### Feasibility
+
+The current build is intentionally narrow and deployable: synthetic FHIR fixtures,
+FastMCP tools, Render Docker deployment, health checks, smoke tests, rule profiles,
+audit trail, in-memory demo state, and a provider interface that can be disabled.
+
+### HIPAA And Production Readiness
+
+This repository is demo-only and must not receive PHI. A production version would
+need a HIPAA-eligible hosting path and BAA, encrypted storage, tenant-aware access
+controls, least-privilege SMART scopes, audit-log retention, monitoring, incident
+response procedures, formal security review, and reviewed EHR write workflows.

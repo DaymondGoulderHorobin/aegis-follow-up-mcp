@@ -31,9 +31,14 @@ MCP_TRANSPORT=streamable-http
 MCP_JSON_RESPONSE=false
 MCP_STATELESS_HTTP=false
 ALLOWED_ORIGINS=
+LLM_PROVIDER=disabled
+LLM_MODEL=gemini-2.5-flash
+LLM_TIMEOUT_SECONDS=20
+LLM_MAX_OUTPUT_TOKENS=700
 ```
 
 Keep `FIXTURE_MODE=true` for the demo. Do not configure real FHIR credentials in the deployment.
+Leave `GEMINI_API_KEY` unset unless deliberately testing real LLM narrative mode.
 
 ## Render Blueprint Setup
 
@@ -42,9 +47,11 @@ Keep `FIXTURE_MODE=true` for the demo. Do not configure real FHIR credentials in
 3. Confirm the service uses Docker runtime.
 4. Confirm `healthCheckPath` is `/healthz`.
 5. Confirm `FIXTURE_MODE=true`.
-6. Apply the Blueprint and wait for the first deploy.
+6. Confirm `LLM_PROVIDER=disabled` for reliable fallback-mode testing.
+7. Apply the Blueprint and wait for the first deploy.
 
-The Blueprint is intentionally synthetic-only and does not include FHIR tokens or secrets.
+The Blueprint is intentionally synthetic-only and does not include FHIR tokens, Gemini
+keys, or other secrets.
 
 Render references:
 
@@ -63,6 +70,20 @@ Use this if the Blueprint path is not available:
 5. Set the environment variables listed above.
 6. Deploy the service.
 
+## Optional Gemini Narrative Mode
+
+Fallback mode works without any API key. To test real Gemini synthesis on Render:
+
+1. Open the Render service environment settings.
+2. Add `GEMINI_API_KEY` as a secret value. Never place it in GitHub, docs, logs, or screenshots.
+3. Set `LLM_PROVIDER=gemini`.
+4. Keep `LLM_MODEL=gemini-2.5-flash` unless deliberately testing another available Gemini model.
+5. Redeploy the service.
+6. Run the smoke script with `--expect-real-llm`.
+
+The Gemini REST call uses the Google AI `generateContent` API with the key sent in
+the `x-goog-api-key` header.
+
 ## Smoke Checks
 
 Health:
@@ -79,9 +100,18 @@ MCP:
 python scripts/smoke_mcp.py --url https://follow-up-radar-mcp.onrender.com/mcp/
 ```
 
+Real LLM mode:
+
+```bash
+python scripts/smoke_mcp.py --url https://follow-up-radar-mcp.onrender.com/mcp/ --expect-real-llm
+```
+
 For Sprint 4, the smoke script also validates that MCP initialize capabilities include `ai.promptopinion/fhir-context` with optional scopes and no `offline_access`.
 
-The smoke script validates the priority tool and workflow layer: critical synthetic potassium triage, task queue, audit trail, and simulated review state with no EHR write.
+The smoke script validates the priority tool, workflow layer, dynamic EHR summary
+metrics, and AI brief fallback mode: critical synthetic potassium triage, task queue,
+audit trail, simulated review state with no EHR write, and deterministic narrative
+fallback with no API key.
 
 If `GET /mcp` returns `406`, that does not by itself mean the MCP endpoint is broken. Use an MCP client, MCP Inspector, or the smoke script.
 

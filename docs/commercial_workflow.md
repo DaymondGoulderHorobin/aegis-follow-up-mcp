@@ -11,14 +11,16 @@ Clinical decision support only. For clinician review. Not a diagnosis or treatme
 3. Deterministic rules inspect recent observations and documented follow-up evidence.
 4. Audit trail entries explain why each relevant result was flagged or suppressed.
 5. The task queue groups unresolved findings by clinician-review priority.
-6. Demo workflow state can mark tasks as reviewed, follow-up documented, or dismissed with a reason.
-7. Production integration could create clinician-reviewed EHR tasks or notes after human confirmation.
+6. Optional AI synthesis produces a concise narrative from the deterministic evidence.
+7. Demo workflow state can mark tasks as reviewed, follow-up documented, or dismissed with a reason.
+8. Production integration could create clinician-reviewed EHR tasks or notes after human confirmation.
 
 ## Buyer Value
 
 - Auditability: each result has a rule ID, evidence, and decision reason.
 - Configurability: static profiles show how clinics can tune deterministic workflow emphasis.
 - Operational workflow: task queues make unresolved follow-up work visible by priority.
+- Controlled AI: narrative generation is optional, guarded, and backed by deterministic fallback.
 - Human-in-the-loop safety: the demo workflow records review state and states that no EHR write occurred.
 - Integration credibility: the EHR summary describes FHIR-in and clinician-reviewed task or note out.
 
@@ -30,7 +32,7 @@ Clinical decision support only. For clinician review. Not a diagnosis or treatme
 - No EHR writes.
 - No refresh tokens.
 - No `offline_access`.
-- No LLM summarisation.
+- Optional LLM summarisation only; deterministic rules remain the source of truth.
 - No autonomous clinical actions.
 
 ## EHR Integration Story

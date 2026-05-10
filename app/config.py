@@ -18,12 +18,16 @@ if load_dotenv is not None:
 @dataclass(frozen=True)
 class Settings:
     project_name: str = "Follow-Up Radar MCP"
-    version: str = "0.6.0"
+    version: str = "0.7.0"
     app_env: str = os.getenv("APP_ENV", "local")
     log_level: str = os.getenv("LOG_LEVEL", "INFO")
     fixture_mode: bool = os.getenv("FIXTURE_MODE", "true").lower() == "true"
     host: str = os.getenv("HOST", "0.0.0.0")
     port: int = int(os.getenv("PORT", "8000"))
+    llm_provider: str = os.getenv("LLM_PROVIDER", "disabled")
+    llm_model: str = os.getenv("LLM_MODEL", "gemini-2.5-flash")
+    llm_timeout_seconds: float = float(os.getenv("LLM_TIMEOUT_SECONDS", "20"))
+    llm_max_output_tokens: int = int(os.getenv("LLM_MAX_OUTPUT_TOKENS", "700"))
     allowed_origins: tuple[str, ...] = tuple(
         origin.strip()
         for origin in os.getenv("ALLOWED_ORIGINS", "").split(",")
