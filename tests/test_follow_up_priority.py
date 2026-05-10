@@ -7,12 +7,12 @@ def test_critical_potassium_patient_gets_same_day_review_consideration() -> None
 
     assert assessment["disclaimer"] == CLINICIAN_REVIEW_DISCLAIMER
     assert assessment["patient_id"] == "synthetic-patient-003"
+    assert assessment["profile_id"] == "default_primary_care"
     assert assessment["priority_tier"] == "same_day_clinician_review_consideration"
     assert assessment["findings"][0]["display"] == "Potassium"
     assert assessment["findings"][0]["severity"] == "high"
     assert assessment["suggested_clinician_review_actions"] == [
-        "Clinician may wish to review the result, confirm follow-up status, "
-        "and document the plan if appropriate."
+        "Clinician may wish to review and document follow-up status if appropriate."
     ]
 
 

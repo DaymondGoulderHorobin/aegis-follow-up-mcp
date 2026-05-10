@@ -1,0 +1,17 @@
+{
+  "profile_id": "safety_critical_labs",
+  "display_name": "Safety Critical Labs",
+  "description": "Deterministic profile emphasizing critical or potentially high-risk lab categories for clinician review workflows.",
+  "priority_overrides": {
+    "Potassium": "same_day_clinician_review_consideration",
+    "Creatinine": "soon_clinician_review_consideration",
+    "Estimated GFR": "soon_clinician_review_consideration",
+    "Hemoglobin": "routine_clinician_review"
+  },
+  "emphasis": [
+    "Safety-sensitive lab review",
+    "Critical abnormal result visibility",
+    "Prompt clinician review queue routing"
+  ],
+  "safety_language": "Clinician may wish to review safety-sensitive results and document follow-up status if appropriate."
+}

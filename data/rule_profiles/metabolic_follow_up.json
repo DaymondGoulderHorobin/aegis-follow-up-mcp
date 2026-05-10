@@ -1,0 +1,18 @@
+{
+  "profile_id": "metabolic_follow_up",
+  "display_name": "Metabolic Follow-Up",
+  "description": "Deterministic profile emphasizing A1c, glucose, lipids, renal function, and related follow-up review.",
+  "priority_overrides": {
+    "Hemoglobin A1c": "soon_clinician_review_consideration",
+    "LDL cholesterol": "soon_clinician_review_consideration",
+    "Creatinine": "routine_clinician_review",
+    "Estimated GFR": "routine_clinician_review",
+    "Potassium": "same_day_clinician_review_consideration"
+  },
+  "emphasis": [
+    "Metabolic monitoring",
+    "Renal function context",
+    "Lipid follow-up review"
+  ],
+  "safety_language": "Clinician may wish to review metabolic follow-up status and document review notes if appropriate."
+}

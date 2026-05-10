@@ -11,7 +11,7 @@ Clinical decision support only. For clinician review. Not a diagnosis or treatme
 - Data mode: synthetic FHIR fixtures only
 - Target MCP endpoint: `/mcp/`
 - Health endpoints: `/healthz`, `/readyz`, `/version`
-- Current version: `0.5.0`
+- Current version: `0.6.0`
 
 ## Local Setup
 
@@ -82,6 +82,11 @@ The server exposes these MCP tools:
 - `generate_follow_up_brief`
 - `draft_clinician_note`
 - `assess_follow_up_priority`
+- `list_rule_profiles`
+- `explain_result_decisions`
+- `list_follow_up_tasks`
+- `update_follow_up_task_status`
+- `get_ehr_integration_summary`
 
 The code registers these tools with FastMCP when the `fastmcp` package is installed. In local fixture-only test environments without FastMCP, `/mcp` returns tool metadata so the rest of the project remains testable.
 
@@ -94,11 +99,20 @@ The code registers these tools with FastMCP when the `fastmcp` package is instal
 
 It does not return diagnosis, prescribing, treatment-plan, or medication-adjustment instructions.
 
+Sprint 6 adds a product workflow layer:
+
+- audit trail decisions that explain flagged and suppressed results
+- static deterministic rule profiles for clinic workflow tuning
+- a priority-grouped follow-up task queue
+- simulated clinician review state with no EHR write
+- an EHR integration summary for FHIR-in and clinician-reviewed task or note out
+
 For MCP Inspector and deployment guidance, see:
 
 - `docs/mcp_inspector.md`
 - `docs/deployment.md`
 - `docs/prompt_opinion_setup.md`
+- `docs/commercial_workflow.md`
 
 ## Prompt Opinion Integration Notes
 
@@ -128,7 +142,7 @@ If any required context is missing, the app uses fixture mode.
 
 ## Synthetic Data And Safety
 
-The included fixture data is synthetic and intentionally small for a reliable hackathon demo. Sprint 5 includes multiple synthetic outcomes:
+The included fixture data is synthetic and intentionally small for a reliable hackathon demo. It includes multiple synthetic outcomes:
 
 - `synthetic-patient-001`: unresolved A1c and LDL, with potassium suppressed by follow-up evidence.
 - `synthetic-patient-003`: high potassium without follow-up evidence for priority triage testing.

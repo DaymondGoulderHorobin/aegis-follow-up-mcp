@@ -19,7 +19,7 @@ The final URL should be replaced with the actual Render service URL if Render as
    ```
 3. Open Prompt Opinion and add the MCP server URL.
 4. Continue through initialization so Prompt Opinion can inspect capabilities.
-5. Confirm tool discovery lists all six tools.
+5. Confirm tool discovery lists the Sprint 6 workflow tools.
 6. Confirm the FHIR-context trust or extension toggle appears.
 7. Confirm all requested scopes are optional.
 8. Invoke `get_patient_snapshot` for `synthetic-patient-001`.
@@ -27,7 +27,11 @@ The final URL should be replaced with the actual Render service URL if Render as
 10. Invoke `generate_follow_up_brief` for `synthetic-patient-001`.
 11. Invoke `assess_follow_up_priority` for `synthetic-patient-003`.
 12. Invoke `assess_follow_up_priority` for `synthetic-patient-004`.
-13. Record any initialization, trust-toggle, header-forwarding, or timeout notes for demo rehearsal.
+13. Invoke `list_follow_up_tasks` with the default profile.
+14. Invoke `explain_result_decisions` for `synthetic-patient-001`.
+15. Invoke `update_follow_up_task_status` for a demo task.
+16. Invoke `get_ehr_integration_summary`.
+17. Record any initialization, trust-toggle, header-forwarding, or timeout notes for demo rehearsal.
 
 ## FHIR-Context Extension
 
@@ -57,10 +61,15 @@ Prompt Opinion should discover:
 - `generate_follow_up_brief`
 - `draft_clinician_note`
 - `assess_follow_up_priority`
+- `list_rule_profiles`
+- `explain_result_decisions`
+- `list_follow_up_tasks`
+- `update_follow_up_task_status`
+- `get_ehr_integration_summary`
 
 ## Synthetic Fixture Mode
 
-Sprint 5 defaults to synthetic fixture mode. If Prompt Opinion does not pass FHIR headers during testing, the server still works against these fixture patients:
+Sprint 6 defaults to synthetic fixture mode. If Prompt Opinion does not pass FHIR headers during testing, the server still works against these fixture patients:
 
 - `synthetic-patient-001`: unresolved A1c and LDL.
 - `synthetic-patient-003`: high potassium priority case.
@@ -93,11 +102,29 @@ Use Follow-Up Radar MCP tool output as clinical decision support only. Do not ad
 
 The server itself validates clinician-facing text for disallowed recommendation phrases, but the BYO agent should still be instructed not to embellish tool results.
 
+## Workflow Demo Prompts
+
+```text
+List the follow-up task queue using the default primary care profile.
+```
+
+```text
+Explain why synthetic-patient-001 was flagged or suppressed.
+```
+
+```text
+Mark task-synthetic-patient-003-obs-potassium-003-2026-04-24 as reviewed in the demo workflow and confirm whether any EHR write was performed.
+```
+
+```text
+Summarize the EHR integration model for Follow-Up Radar.
+```
+
 ## Troubleshooting
 
 - Failed initialization: confirm the URL ends in `/mcp/` and the server is awake.
 - Missing FHIR-context toggle: run the smoke script and confirm initialize capabilities include `ai.promptopinion/fhir-context`.
-- Missing tools: open `/version` and verify the deployed code is version `0.5.0`.
+- Missing tools: open `/version` and verify the deployed code is version `0.6.0`.
 - Timeout: warm the deployment with `/healthz`, then retry initialization.
 - Plain `GET /mcp` returns `406`: use MCP Inspector or Prompt Opinion instead of a browser GET.
 - Wrong patient: pass `patient_id` as a tool argument, or pass `X-Patient-ID` when the client supports custom headers.

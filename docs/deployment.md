@@ -81,7 +81,7 @@ python scripts/smoke_mcp.py --url https://follow-up-radar-mcp.onrender.com/mcp/
 
 For Sprint 4, the smoke script also validates that MCP initialize capabilities include `ai.promptopinion/fhir-context` with optional scopes and no `offline_access`.
 
-For Sprint 5, the smoke script also validates the sixth tool, `assess_follow_up_priority`, against the critical synthetic potassium case.
+The smoke script validates the priority tool and workflow layer: critical synthetic potassium triage, task queue, audit trail, and simulated review state with no EHR write.
 
 If `GET /mcp` returns `406`, that does not by itself mean the MCP endpoint is broken. Use an MCP client, MCP Inspector, or the smoke script.
 

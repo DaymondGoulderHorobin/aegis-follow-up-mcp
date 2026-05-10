@@ -1,0 +1,16 @@
+{
+  "profile_id": "default_primary_care",
+  "display_name": "Default Primary Care",
+  "description": "Balanced follow-up review profile for general primary care workflows.",
+  "priority_overrides": {
+    "Potassium": "same_day_clinician_review_consideration",
+    "Hemoglobin A1c": "soon_clinician_review_consideration",
+    "LDL cholesterol": "soon_clinician_review_consideration"
+  },
+  "emphasis": [
+    "General unresolved abnormal-result follow-up",
+    "Recent lab results without documented follow-up evidence",
+    "Clinician review queue prioritization"
+  ],
+  "safety_language": "Clinician may wish to review and document follow-up status if appropriate."
+}

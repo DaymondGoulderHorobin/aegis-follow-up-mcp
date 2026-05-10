@@ -1,0 +1,17 @@
+{
+  "profile_id": "cardiovascular_follow_up",
+  "display_name": "Cardiovascular Follow-Up",
+  "description": "Deterministic profile emphasizing LDL, blood pressure observations, lipids, and cardiovascular follow-up review.",
+  "priority_overrides": {
+    "LDL cholesterol": "soon_clinician_review_consideration",
+    "Systolic blood pressure": "routine_clinician_review",
+    "Diastolic blood pressure": "routine_clinician_review",
+    "Potassium": "same_day_clinician_review_consideration"
+  },
+  "emphasis": [
+    "Lipid follow-up review",
+    "Blood pressure observation review",
+    "Cardiovascular workflow prioritization"
+  ],
+  "safety_language": "Clinician may wish to review cardiovascular follow-up status and document review notes if appropriate."
+}

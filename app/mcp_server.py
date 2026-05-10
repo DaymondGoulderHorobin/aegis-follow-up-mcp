@@ -17,11 +17,16 @@ from app.prompt_opinion.fhir_context_extension import (
     install_fhir_context_extension,
 )
 from app.services.abnormal_results import find_unresolved_abnormal_results as find_results
+from app.services.audit_trail import explain_result_decisions as build_audit_trail
 from app.services.brief_generator import generate_follow_up_brief as build_brief
+from app.services.ehr_integration import get_ehr_integration_summary as build_ehr_summary
 from app.services.follow_up_priority import assess_follow_up_priority as build_priority
+from app.services.follow_up_tasks import list_follow_up_tasks as build_task_queue
 from app.services.note_drafter import draft_clinician_note as build_note
 from app.services.observations import get_recent_observations as build_observations
 from app.services.patient_snapshot import get_patient_snapshot as build_snapshot
+from app.services.rule_profiles import list_rule_profiles as build_rule_profiles
+from app.services.workflow_state import update_follow_up_task_status as build_status_update
 
 
 class LocalMCPRegistry:
@@ -98,10 +103,61 @@ def draft_clinician_note(patient_id: str | None = None) -> dict[str, str]:
 
 
 @_register_tool
-def assess_follow_up_priority(patient_id: str | None = None) -> dict[str, Any]:
+def assess_follow_up_priority(
+    patient_id: str | None = None,
+    profile_id: str = "default_primary_care",
+) -> dict[str, Any]:
     """Assess deterministic clinician-review priority for unresolved abnormalities."""
 
-    return build_priority(patient_id=resolve_patient_id(patient_id))
+    return build_priority(patient_id=resolve_patient_id(patient_id), profile_id=profile_id)
+
+
+@_register_tool
+def list_rule_profiles() -> dict[str, Any]:
+    """Return available deterministic rule profiles."""
+
+    return build_rule_profiles()
+
+
+@_register_tool
+def explain_result_decisions(
+    patient_id: str | None = None,
+    profile_id: str = "default_primary_care",
+) -> dict[str, Any]:
+    """Return audit decisions explaining flagged and suppressed synthetic results."""
+
+    return build_audit_trail(
+        patient_id=resolve_patient_id(patient_id),
+        profile_id=profile_id,
+    )
+
+
+@_register_tool
+def list_follow_up_tasks(
+    profile_id: str = "default_primary_care",
+    patient_ids: list[str] | None = None,
+) -> dict[str, Any]:
+    """Return a priority-grouped synthetic follow-up task queue."""
+
+    return build_task_queue(profile_id=profile_id, patient_ids=patient_ids)
+
+
+@_register_tool
+def update_follow_up_task_status(
+    task_id: str,
+    status: str,
+    reason: str | None = None,
+) -> dict[str, Any]:
+    """Simulate clinician review state without writing to an EHR."""
+
+    return build_status_update(task_id=task_id, status=status, reason=reason)
+
+
+@_register_tool
+def get_ehr_integration_summary() -> dict[str, Any]:
+    """Return the current and future EHR integration story."""
+
+    return build_ehr_summary()
 
 
 def get_registered_tool_names() -> list[str]:
