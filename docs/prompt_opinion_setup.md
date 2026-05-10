@@ -18,11 +18,32 @@ The final URL should be replaced with the actual Render service URL if Render as
    python scripts/smoke_mcp.py --url https://follow-up-radar-mcp.onrender.com/mcp/
    ```
 3. Open Prompt Opinion and add the MCP server URL.
-4. Confirm tool discovery lists all five tools.
-5. Invoke `get_patient_snapshot` for `synthetic-patient-001`.
-6. Invoke `find_unresolved_abnormal_results` for `synthetic-patient-001`.
-7. Invoke `generate_follow_up_brief` for `synthetic-patient-001`.
-8. Record any initialization or timeout notes for demo rehearsal.
+4. Continue through initialization so Prompt Opinion can inspect capabilities.
+5. Confirm tool discovery lists all five tools.
+6. Confirm the FHIR-context trust or extension toggle appears.
+7. Confirm all requested scopes are optional.
+8. Invoke `get_patient_snapshot` for `synthetic-patient-001`.
+9. Invoke `find_unresolved_abnormal_results` for `synthetic-patient-001`.
+10. Invoke `generate_follow_up_brief` for `synthetic-patient-001`.
+11. Record any initialization, trust-toggle, header-forwarding, or timeout notes for demo rehearsal.
+
+## FHIR-Context Extension
+
+Sprint 4 advertises Prompt Opinion's documented MCP extension during initialize:
+
+```text
+capabilities.extensions.ai.promptopinion/fhir-context
+```
+
+Requested scopes:
+
+- `patient/Patient.rs`
+- `patient/Observation.rs`
+- `patient/Condition.rs`
+- `patient/MedicationStatement.rs`
+- `patient/Encounter.rs`
+
+All scopes are optional by default. Users can leave the extension disabled and still use the deterministic synthetic demo. The server does not request `offline_access`, does not receive refresh tokens, and does not perform real external FHIR reads in Sprint 4.
 
 ## Expected Tools
 
@@ -36,9 +57,9 @@ Prompt Opinion should discover:
 
 ## Synthetic Fixture Mode
 
-Sprint 3 defaults to synthetic fixture mode. If Prompt Opinion does not pass FHIR headers during early testing, the server still works against `synthetic-patient-001`.
+Sprint 4 defaults to synthetic fixture mode. If Prompt Opinion does not pass FHIR headers during early testing, the server still works against `synthetic-patient-001`.
 
-If Prompt Opinion can pass context headers, the server accepts these case-insensitively:
+If a user trusts the server and authorizes FHIR context, Prompt Opinion may pass these headers. The server accepts them case-insensitively:
 
 - `X-FHIR-Server-URL`
 - `X-FHIR-Access-Token`
@@ -57,7 +78,8 @@ Expected behavior: unresolved A1c and LDL findings appear with evidence and clin
 ## Troubleshooting
 
 - Failed initialization: confirm the URL ends in `/mcp/` and the server is awake.
-- Missing tools: open `/version` and verify the deployed code is version `0.3.0`.
+- Missing FHIR-context toggle: run the smoke script and confirm initialize capabilities include `ai.promptopinion/fhir-context`.
+- Missing tools: open `/version` and verify the deployed code is version `0.4.0`.
 - Timeout: warm the deployment with `/healthz`, then retry initialization.
 - Plain `GET /mcp` returns `406`: use MCP Inspector or Prompt Opinion instead of a browser GET.
 - Wrong patient: pass `patient_id` as a tool argument, or pass `X-Patient-ID` when the client supports custom headers.

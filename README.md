@@ -57,7 +57,7 @@ docker run --rm -p 8000:8000 follow-up-radar-mcp
 
 ## Deployment
 
-Sprint 3 adds Render Blueprint configuration in `render.yaml`.
+The project includes Render Blueprint configuration in `render.yaml`.
 
 Expected deployed MCP URL after provisioning:
 
@@ -91,9 +91,23 @@ For MCP Inspector and deployment guidance, see:
 
 ## Prompt Opinion Integration Notes
 
-The server stays MCP-first and deterministic. Sprint 3 focuses on public HTTPS deployment and Prompt Opinion validation without adding an LLM layer.
+The server stays MCP-first and deterministic. Sprint 4 advertises Prompt Opinion's FHIR-context MCP extension during initialize:
 
-Expected FHIR context headers for future external mode:
+```text
+capabilities.extensions.ai.promptopinion/fhir-context
+```
+
+Requested SMART scopes are optional by default:
+
+- `patient/Patient.rs`
+- `patient/Observation.rs`
+- `patient/Condition.rs`
+- `patient/MedicationStatement.rs`
+- `patient/Encounter.rs`
+
+The server does not request `offline_access`, does not handle refresh tokens, does not fetch real FHIR data, and does not add an LLM layer.
+
+If a Prompt Opinion user trusts the server and authorizes FHIR context, these headers may be sent to tool calls:
 
 - `X-FHIR-Server-URL`
 - `X-FHIR-Access-Token`

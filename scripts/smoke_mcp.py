@@ -10,6 +10,11 @@ from typing import Any
 
 from fastmcp import Client
 
+from app.prompt_opinion.fhir_context_extension import (
+    DEFAULT_FHIR_CONTEXT_SCOPES,
+    PROMPT_OPINION_FHIR_CONTEXT_EXTENSION,
+)
+
 EXPECTED_TOOLS = {
     "get_patient_snapshot",
     "get_recent_observations",
@@ -58,8 +63,52 @@ def _require_text(haystack: str, needle: str, label: str) -> None:
         raise SystemExit(f"Expected {needle!r} in {label}.")
 
 
+def _extensions_from_capabilities(capabilities: Any) -> dict[str, Any]:
+    extensions = getattr(capabilities, "extensions", None)
+    if extensions is None:
+        model_extra = getattr(capabilities, "model_extra", None) or {}
+        extensions = model_extra.get("extensions", {})
+    if not isinstance(extensions, dict):
+        return {}
+    return extensions
+
+
+def _validate_prompt_opinion_extension(initialize_result: Any) -> dict[str, Any]:
+    capabilities = getattr(initialize_result, "capabilities", None)
+    extensions = _extensions_from_capabilities(capabilities)
+    extension = extensions.get(PROMPT_OPINION_FHIR_CONTEXT_EXTENSION)
+    if extension is None:
+        raise SystemExit(
+            f"Missing {PROMPT_OPINION_FHIR_CONTEXT_EXTENSION!r} in initialize capabilities."
+        )
+
+    scopes = extension.get("scopes", [])
+    expected_scope_names = [scope["name"] for scope in DEFAULT_FHIR_CONTEXT_SCOPES]
+    actual_scope_names = [scope.get("name") for scope in scopes]
+    if actual_scope_names != expected_scope_names:
+        raise SystemExit(
+            "Prompt Opinion FHIR-context scopes did not match expected optional scopes."
+        )
+    if any(scope.get("required", False) for scope in scopes):
+        raise SystemExit("Prompt Opinion FHIR-context scopes must be optional by default.")
+    if "offline_access" in actual_scope_names:
+        raise SystemExit("offline_access must not be requested in Sprint 4.")
+
+    return {
+        "name": PROMPT_OPINION_FHIR_CONTEXT_EXTENSION,
+        "scopes": actual_scope_names,
+        "required_scopes": [
+            scope.get("name")
+            for scope in scopes
+            if scope.get("required", False)
+        ],
+    }
+
+
 async def smoke_once(url: str, timeout: float) -> dict[str, Any]:
     async with Client(url, timeout=timeout, init_timeout=timeout) as client:
+        initialize_result = client.initialize_result or await client.initialize()
+        extension_summary = _validate_prompt_opinion_extension(initialize_result)
         tools = await client.list_tools()
         tool_names = {tool.name for tool in tools}
         missing = EXPECTED_TOOLS - tool_names
@@ -84,7 +133,9 @@ async def smoke_once(url: str, timeout: float) -> dict[str, Any]:
     return {
         "endpoint": url,
         "tools": sorted(tool_names),
+        "prompt_opinion_extension": extension_summary,
         "validated_calls": [
+            "initialize_capabilities",
             "find_unresolved_abnormal_results",
             "generate_follow_up_brief",
         ],

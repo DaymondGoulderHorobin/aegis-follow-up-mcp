@@ -85,4 +85,4 @@ Expected smoke result:
 
 ## Sprint 4
 
-Only after deployed MCP and Prompt Opinion validation succeeds should Sprint 4 add optional LLM summarisation behind the deterministic output interface.
+Sprint 4 advertises Prompt Opinion FHIR-context MCP extension support while keeping the server deterministic and synthetic-data only.
