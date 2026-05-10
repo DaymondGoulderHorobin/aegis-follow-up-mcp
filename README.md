@@ -11,6 +11,7 @@ Clinical decision support only. For clinician review. Not a diagnosis or treatme
 - Data mode: synthetic FHIR fixtures only
 - Target MCP endpoint: `/mcp/`
 - Health endpoints: `/healthz`, `/readyz`, `/version`
+- Current version: `0.5.0`
 
 ## Local Setup
 
@@ -80,8 +81,18 @@ The server exposes these MCP tools:
 - `find_unresolved_abnormal_results`
 - `generate_follow_up_brief`
 - `draft_clinician_note`
+- `assess_follow_up_priority`
 
 The code registers these tools with FastMCP when the `fastmcp` package is installed. In local fixture-only test environments without FastMCP, `/mcp` returns tool metadata so the rest of the project remains testable.
+
+`assess_follow_up_priority` returns deterministic clinician-review priority tiers:
+
+- `same_day_clinician_review_consideration`
+- `soon_clinician_review_consideration`
+- `routine_clinician_review`
+- `no_unresolved_abnormal_result_found`
+
+It does not return diagnosis, prescribing, treatment-plan, or medication-adjustment instructions.
 
 For MCP Inspector and deployment guidance, see:
 
@@ -117,6 +128,13 @@ If any required context is missing, the app uses fixture mode.
 
 ## Synthetic Data And Safety
 
-The included fixture data is synthetic and intentionally small for a reliable hackathon demo. Do not add real patient names, addresses, phone numbers, emails, identifiers, access tokens, or refresh tokens to this repository.
+The included fixture data is synthetic and intentionally small for a reliable hackathon demo. Sprint 5 includes multiple synthetic outcomes:
 
-All generated summaries are framed as clinician support. The app does not diagnose, prescribe, or replace clinical judgement.
+- `synthetic-patient-001`: unresolved A1c and LDL, with potassium suppressed by follow-up evidence.
+- `synthetic-patient-003`: high potassium without follow-up evidence for priority triage testing.
+- `synthetic-patient-004`: clean chart with no unresolved abnormal results.
+- `synthetic-patient-005`: abnormal A1c suppressed by follow-up evidence.
+
+Do not add real patient names, addresses, phone numbers, emails, identifiers, access tokens, or refresh tokens to this repository.
+
+All generated summaries are framed as clinician support. The app does not diagnose, prescribe, or replace clinical judgement. Reusable safety validation flags disallowed recommendation phrases before clinician-facing payloads are returned.

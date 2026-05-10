@@ -21,6 +21,7 @@ EXPECTED_TOOLS = {
     "find_unresolved_abnormal_results",
     "generate_follow_up_brief",
     "draft_clinician_note",
+    "assess_follow_up_priority",
 }
 
 
@@ -92,7 +93,7 @@ def _validate_prompt_opinion_extension(initialize_result: Any) -> dict[str, Any]
     if any(scope.get("required", False) for scope in scopes):
         raise SystemExit("Prompt Opinion FHIR-context scopes must be optional by default.")
     if "offline_access" in actual_scope_names:
-        raise SystemExit("offline_access must not be requested in Sprint 4.")
+        raise SystemExit("offline_access must not be requested for this demo.")
 
     return {
         "name": PROMPT_OPINION_FHIR_CONTEXT_EXTENSION,
@@ -123,12 +124,22 @@ async def smoke_once(url: str, timeout: float) -> dict[str, Any]:
             "generate_follow_up_brief",
             {"patient_id": "synthetic-patient-001"},
         )
+        priority = await client.call_tool(
+            "assess_follow_up_priority",
+            {"patient_id": "synthetic-patient-003"},
+        )
 
     findings_text = _content_to_text(findings)
     brief_text = _content_to_text(brief)
+    priority_text = _content_to_text(priority)
     _require_text(findings_text, "Hemoglobin A1c", "unresolved abnormal findings")
     _require_text(findings_text, "LDL cholesterol", "unresolved abnormal findings")
     _require_text(brief_text, "Clinical decision support only", "follow-up brief")
+    _require_text(
+        priority_text,
+        "same_day_clinician_review_consideration",
+        "follow-up priority assessment",
+    )
 
     return {
         "endpoint": url,
@@ -138,6 +149,7 @@ async def smoke_once(url: str, timeout: float) -> dict[str, Any]:
             "initialize_capabilities",
             "find_unresolved_abnormal_results",
             "generate_follow_up_brief",
+            "assess_follow_up_priority",
         ],
     }
 

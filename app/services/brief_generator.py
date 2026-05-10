@@ -5,6 +5,10 @@ from __future__ import annotations
 from typing import Any
 
 from app.safety.disclaimers import CLINICIAN_REVIEW_DISCLAIMER
+from app.safety.output_validation import (
+    assert_clinician_facing_payload_safe,
+    assert_disclaimer_present,
+)
 from app.services.abnormal_results import find_unresolved_abnormal_results
 from app.services.patient_snapshot import get_patient_snapshot
 
@@ -22,7 +26,7 @@ def generate_follow_up_brief(patient_id: str | None = None) -> dict[str, Any]:
     else:
         summary = "No unresolved abnormal results were found in the synthetic fixture data."
 
-    return {
+    payload = {
         "disclaimer": CLINICIAN_REVIEW_DISCLAIMER,
         "patient": {
             "patient_id": patient.patient_id,
@@ -36,3 +40,6 @@ def generate_follow_up_brief(patient_id: str | None = None) -> dict[str, Any]:
             finding.suggested_clinician_review_action for finding in findings
         ],
     }
+    assert_disclaimer_present(payload)
+    assert_clinician_facing_payload_safe(payload)
+    return payload

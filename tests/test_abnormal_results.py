@@ -16,6 +16,22 @@ def test_second_patient_has_no_unresolved_abnormal_results() -> None:
     assert find_unresolved_abnormal_results(patient_id="synthetic-patient-002") == []
 
 
+def test_critical_patient_has_unresolved_high_potassium() -> None:
+    findings = find_unresolved_abnormal_results(patient_id="synthetic-patient-003")
+
+    assert [(finding.display, finding.severity) for finding in findings] == [
+        ("Potassium", "high")
+    ]
+
+
+def test_clean_patient_has_no_unresolved_abnormal_results() -> None:
+    assert find_unresolved_abnormal_results(patient_id="synthetic-patient-004") == []
+
+
+def test_follow_up_evidence_patient_suppresses_false_positive() -> None:
+    assert find_unresolved_abnormal_results(patient_id="synthetic-patient-005") == []
+
+
 def test_resolved_abnormal_result_is_suppressed_with_follow_up_reference() -> None:
     findings = find_unresolved_abnormal_results()
 

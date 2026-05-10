@@ -19,3 +19,11 @@ def test_unknown_patient_id_does_not_fall_back_to_first_patient() -> None:
     assert snapshot.patient_id == "unknown-patient"
     assert snapshot.name == "Synthetic Patient"
     assert snapshot.conditions == []
+
+
+def test_patient_lookup_selects_critical_synthetic_patient() -> None:
+    snapshot = get_patient_snapshot(patient_id="synthetic-patient-003")
+
+    assert snapshot.patient_id == "synthetic-patient-003"
+    assert snapshot.name == "Morgan Chen"
+    assert snapshot.conditions == ["Chronic kidney disease risk monitoring"]

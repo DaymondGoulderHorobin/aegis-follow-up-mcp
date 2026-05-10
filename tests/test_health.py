@@ -9,6 +9,7 @@ EXPECTED_TOOLS = {
     "find_unresolved_abnormal_results",
     "generate_follow_up_brief",
     "draft_clinician_note",
+    "assess_follow_up_priority",
 }
 
 
@@ -34,7 +35,7 @@ def test_version() -> None:
 
     assert response.status_code == 200
     assert response.json()["project"] == "Follow-Up Radar MCP"
-    assert response.json()["version"] == "0.4.0"
+    assert response.json()["version"] == "0.5.0"
     assert response.json()["mcp_transport"] == "streamable-http"
 
 

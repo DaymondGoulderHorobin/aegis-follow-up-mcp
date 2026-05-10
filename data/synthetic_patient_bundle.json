@@ -35,6 +35,51 @@
     },
     {
       "resource": {
+        "resourceType": "Patient",
+        "id": "synthetic-patient-003",
+        "name": [
+          {
+            "use": "official",
+            "family": "Chen",
+            "given": ["Morgan"]
+          }
+        ],
+        "gender": "female",
+        "birthDate": "1965-07-22"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Patient",
+        "id": "synthetic-patient-004",
+        "name": [
+          {
+            "use": "official",
+            "family": "Patel",
+            "given": ["Samira"]
+          }
+        ],
+        "gender": "female",
+        "birthDate": "1990-01-09"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Patient",
+        "id": "synthetic-patient-005",
+        "name": [
+          {
+            "use": "official",
+            "family": "Thompson",
+            "given": ["Elliot"]
+          }
+        ],
+        "gender": "male",
+        "birthDate": "1978-09-30"
+      }
+    },
+    {
+      "resource": {
         "resourceType": "Condition",
         "id": "condition-diabetes",
         "subject": {"reference": "Patient/synthetic-patient-001"},
@@ -89,6 +134,60 @@
     },
     {
       "resource": {
+        "resourceType": "Condition",
+        "id": "condition-kidney-risk-003",
+        "subject": {"reference": "Patient/synthetic-patient-003"},
+        "clinicalStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+              "code": "active"
+            }
+          ]
+        },
+        "code": {
+          "text": "Chronic kidney disease risk monitoring"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Condition",
+        "id": "condition-preventive-care-004",
+        "subject": {"reference": "Patient/synthetic-patient-004"},
+        "clinicalStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+              "code": "active"
+            }
+          ]
+        },
+        "code": {
+          "text": "Preventive care review"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Condition",
+        "id": "condition-metabolic-monitoring-005",
+        "subject": {"reference": "Patient/synthetic-patient-005"},
+        "clinicalStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+              "code": "active"
+            }
+          ]
+        },
+        "code": {
+          "text": "Metabolic monitoring"
+        }
+      }
+    },
+    {
+      "resource": {
         "resourceType": "MedicationStatement",
         "id": "med-metformin",
         "subject": {"reference": "Patient/synthetic-patient-001"},
@@ -106,6 +205,17 @@
         "status": "active",
         "medicationCodeableConcept": {
           "text": "Amlodipine 5 mg tablet"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationStatement",
+        "id": "med-lisinopril-003",
+        "subject": {"reference": "Patient/synthetic-patient-003"},
+        "status": "active",
+        "medicationCodeableConcept": {
+          "text": "Lisinopril 10 mg tablet"
         }
       }
     },
@@ -140,6 +250,57 @@
         "period": {
           "start": "2026-04-18T14:00:00+12:00",
           "end": "2026-04-18T14:20:00+12:00"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "encounter-lab-review-003",
+        "status": "finished",
+        "subject": {"reference": "Patient/synthetic-patient-003"},
+        "type": [
+          {
+            "text": "Lab review visit"
+          }
+        ],
+        "period": {
+          "start": "2026-04-19T10:00:00+12:00",
+          "end": "2026-04-19T10:20:00+12:00"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "encounter-wellness-004",
+        "status": "finished",
+        "subject": {"reference": "Patient/synthetic-patient-004"},
+        "type": [
+          {
+            "text": "Wellness review"
+          }
+        ],
+        "period": {
+          "start": "2026-04-16T11:00:00+12:00",
+          "end": "2026-04-16T11:30:00+12:00"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "encounter-results-review-005",
+        "status": "finished",
+        "subject": {"reference": "Patient/synthetic-patient-005"},
+        "type": [
+          {
+            "text": "Results review"
+          }
+        ],
+        "period": {
+          "start": "2026-04-23T13:00:00+12:00",
+          "end": "2026-04-23T13:20:00+12:00"
         }
       }
     },
@@ -466,6 +627,271 @@
     },
     {
       "resource": {
+        "resourceType": "Observation",
+        "id": "obs-potassium-003-2026-04-24",
+        "status": "final",
+        "subject": {"reference": "Patient/synthetic-patient-003"},
+        "effectiveDateTime": "2026-04-24T07:45:00+12:00",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "2823-3",
+              "display": "Potassium"
+            }
+          ],
+          "text": "Potassium"
+        },
+        "valueQuantity": {
+          "value": 6.4,
+          "unit": "mmol/L",
+          "system": "http://unitsofmeasure.org",
+          "code": "mmol/L"
+        },
+        "referenceRange": [
+          {
+            "low": {
+              "value": 3.5,
+              "unit": "mmol/L"
+            },
+            "high": {
+              "value": 5.1,
+              "unit": "mmol/L"
+            }
+          }
+        ],
+        "interpretation": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+                "code": "HH",
+                "display": "Critical high"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-creatinine-003-2026-04-24",
+        "status": "final",
+        "subject": {"reference": "Patient/synthetic-patient-003"},
+        "effectiveDateTime": "2026-04-24T07:45:00+12:00",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "2160-0",
+              "display": "Creatinine"
+            }
+          ],
+          "text": "Creatinine"
+        },
+        "valueQuantity": {
+          "value": 1.0,
+          "unit": "mg/dL",
+          "system": "http://unitsofmeasure.org",
+          "code": "mg/dL"
+        },
+        "referenceRange": [
+          {
+            "low": {
+              "value": 0.5,
+              "unit": "mg/dL"
+            },
+            "high": {
+              "value": 1.1,
+              "unit": "mg/dL"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-a1c-004-2026-04-16",
+        "status": "final",
+        "subject": {"reference": "Patient/synthetic-patient-004"},
+        "effectiveDateTime": "2026-04-16T09:15:00+12:00",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "4548-4",
+              "display": "Hemoglobin A1c/Hemoglobin.total in Blood"
+            }
+          ],
+          "text": "Hemoglobin A1c"
+        },
+        "valueQuantity": {
+          "value": 5.3,
+          "unit": "%",
+          "system": "http://unitsofmeasure.org",
+          "code": "%"
+        },
+        "referenceRange": [
+          {
+            "high": {
+              "value": 5.7,
+              "unit": "%"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-ldl-004-2026-04-16",
+        "status": "final",
+        "subject": {"reference": "Patient/synthetic-patient-004"},
+        "effectiveDateTime": "2026-04-16T09:15:00+12:00",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "13457-7",
+              "display": "Cholesterol in LDL"
+            }
+          ],
+          "text": "LDL cholesterol"
+        },
+        "valueQuantity": {
+          "value": 104,
+          "unit": "mg/dL",
+          "system": "http://unitsofmeasure.org",
+          "code": "mg/dL"
+        },
+        "referenceRange": [
+          {
+            "high": {
+              "value": 129,
+              "unit": "mg/dL"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-potassium-004-2026-04-16",
+        "status": "final",
+        "subject": {"reference": "Patient/synthetic-patient-004"},
+        "effectiveDateTime": "2026-04-16T09:15:00+12:00",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "2823-3",
+              "display": "Potassium"
+            }
+          ],
+          "text": "Potassium"
+        },
+        "valueQuantity": {
+          "value": 4.2,
+          "unit": "mmol/L",
+          "system": "http://unitsofmeasure.org",
+          "code": "mmol/L"
+        },
+        "referenceRange": [
+          {
+            "low": {
+              "value": 3.5,
+              "unit": "mmol/L"
+            },
+            "high": {
+              "value": 5.1,
+              "unit": "mmol/L"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-a1c-005-2026-04-22",
+        "status": "final",
+        "subject": {"reference": "Patient/synthetic-patient-005"},
+        "effectiveDateTime": "2026-04-22T08:00:00+12:00",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "4548-4",
+              "display": "Hemoglobin A1c/Hemoglobin.total in Blood"
+            }
+          ],
+          "text": "Hemoglobin A1c"
+        },
+        "valueQuantity": {
+          "value": 6.5,
+          "unit": "%",
+          "system": "http://unitsofmeasure.org",
+          "code": "%"
+        },
+        "referenceRange": [
+          {
+            "high": {
+              "value": 5.7,
+              "unit": "%"
+            }
+          }
+        ],
+        "interpretation": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+                "code": "H",
+                "display": "High"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-ldl-005-2026-04-22",
+        "status": "final",
+        "subject": {"reference": "Patient/synthetic-patient-005"},
+        "effectiveDateTime": "2026-04-22T08:00:00+12:00",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "13457-7",
+              "display": "Cholesterol in LDL"
+            }
+          ],
+          "text": "LDL cholesterol"
+        },
+        "valueQuantity": {
+          "value": 122,
+          "unit": "mg/dL",
+          "system": "http://unitsofmeasure.org",
+          "code": "mg/dL"
+        },
+        "referenceRange": [
+          {
+            "high": {
+              "value": 129,
+              "unit": "mg/dL"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
         "resourceType": "ServiceRequest",
         "id": "service-repeat-potassium",
         "status": "active",
@@ -478,6 +904,24 @@
         "reasonReference": [
           {
             "reference": "Observation/obs-potassium-2026-04-21"
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "ServiceRequest",
+        "id": "service-a1c-follow-up-005",
+        "status": "active",
+        "intent": "order",
+        "subject": {"reference": "Patient/synthetic-patient-005"},
+        "authoredOn": "2026-04-22T11:00:00+12:00",
+        "code": {
+          "text": "Repeat A1c follow-up review"
+        },
+        "reasonReference": [
+          {
+            "reference": "Observation/obs-a1c-005-2026-04-22"
           }
         ]
       }

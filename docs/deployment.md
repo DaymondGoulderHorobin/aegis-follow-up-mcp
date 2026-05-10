@@ -4,7 +4,7 @@ Recommended target: Render Web Service using the Dockerfile and `render.yaml`.
 
 Clinical decision support only. For clinician review. Not a diagnosis or treatment directive.
 
-Current deployment status: public URL not yet provisioned from this local environment.
+Current deployment status: public Render URL is provisioned for testing.
 
 Expected deployed base URL:
 
@@ -81,6 +81,8 @@ python scripts/smoke_mcp.py --url https://follow-up-radar-mcp.onrender.com/mcp/
 
 For Sprint 4, the smoke script also validates that MCP initialize capabilities include `ai.promptopinion/fhir-context` with optional scopes and no `offline_access`.
 
+For Sprint 5, the smoke script also validates the sixth tool, `assess_follow_up_priority`, against the critical synthetic potassium case.
+
 If `GET /mcp` returns `406`, that does not by itself mean the MCP endpoint is broken. Use an MCP client, MCP Inspector, or the smoke script.
 
 ## Prompt Opinion FHIR Context
@@ -95,7 +97,7 @@ X-FHIR-Access-Token
 X-Patient-ID
 ```
 
-Tokens are not logged or returned. Sprint 4 does not request `offline_access`, does not receive refresh tokens, and does not call an external FHIR server.
+Tokens are not logged or returned. The app does not request `offline_access`, does not receive refresh tokens, and does not call an external FHIR server.
 
 ## Docker
 

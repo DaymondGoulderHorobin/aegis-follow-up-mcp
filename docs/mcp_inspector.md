@@ -40,13 +40,18 @@ In Inspector:
    - `find_unresolved_abnormal_results`
    - `generate_follow_up_brief`
    - `draft_clinician_note`
+   - `assess_follow_up_priority`
 5. Call `find_unresolved_abnormal_results` with:
    ```json
    {"patient_id": "synthetic-patient-001"}
    ```
 6. Call `generate_follow_up_brief` with the same patient ID.
+7. Call `assess_follow_up_priority` with:
+   ```json
+   {"patient_id": "synthetic-patient-003"}
+   ```
 
-Expected result: the first patient has unresolved A1c and LDL findings, while potassium is suppressed because the synthetic bundle includes follow-up evidence.
+Expected result: the first patient has unresolved A1c and LDL findings, while potassium is suppressed because the synthetic bundle includes follow-up evidence. The critical synthetic patient returns `same_day_clinician_review_consideration`.
 
 ## Initialize Capabilities
 
@@ -88,4 +93,4 @@ With the server running:
 python scripts/smoke_mcp.py --url http://127.0.0.1:8000/mcp/
 ```
 
-The script initializes the MCP client, validates the Prompt Opinion FHIR-context extension payload, lists tools, and calls two tools against synthetic fixture mode.
+The script initializes the MCP client, validates the Prompt Opinion FHIR-context extension payload, lists tools, and calls three tools against synthetic fixture mode.
