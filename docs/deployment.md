@@ -25,6 +25,7 @@ APP_ENV=production
 LOG_LEVEL=INFO
 FIXTURE_MODE=true
 FHIR_SYNTHETIC_BUNDLE_PATH=data/synthetic_patient_bundle.json
+LIVE_FHIR_READS_ENABLED=false
 HOST=0.0.0.0
 PORT=8000
 MCP_TRANSPORT=streamable-http
@@ -37,7 +38,7 @@ LLM_TIMEOUT_SECONDS=20
 LLM_MAX_OUTPUT_TOKENS=700
 ```
 
-Keep `FIXTURE_MODE=true` for the demo. Do not configure real FHIR credentials in the deployment.
+Keep `FIXTURE_MODE=true` and `LIVE_FHIR_READS_ENABLED=false` for the demo. Do not configure real FHIR credentials in the deployment.
 Leave `GEMINI_API_KEY` unset unless deliberately testing real LLM narrative mode.
 
 ## Render Blueprint Setup
@@ -47,8 +48,9 @@ Leave `GEMINI_API_KEY` unset unless deliberately testing real LLM narrative mode
 3. Confirm the service uses Docker runtime.
 4. Confirm `healthCheckPath` is `/healthz`.
 5. Confirm `FIXTURE_MODE=true`.
-6. Confirm `LLM_PROVIDER=disabled` for reliable fallback-mode testing.
-7. Apply the Blueprint and wait for the first deploy.
+6. Confirm `LIVE_FHIR_READS_ENABLED=false`.
+7. Confirm `LLM_PROVIDER=disabled` for reliable fallback-mode testing.
+8. Apply the Blueprint and wait for the first deploy.
 
 The Blueprint is intentionally synthetic-only and does not include FHIR tokens, Gemini
 keys, or other secrets.
@@ -109,9 +111,10 @@ python scripts/smoke_mcp.py --url https://follow-up-radar-mcp.onrender.com/mcp/ 
 For Sprint 4, the smoke script also validates that MCP initialize capabilities include `ai.promptopinion/fhir-context` with optional scopes and no `offline_access`.
 
 The smoke script validates the priority tool, workflow layer, dynamic EHR summary
-metrics, and AI brief fallback mode: critical synthetic potassium triage, task queue,
-audit trail, simulated review state with no EHR write, and deterministic narrative
-fallback with no API key.
+metrics, FHIR transparency, payload-only handoff, and AI brief fallback mode:
+critical synthetic potassium triage, task queue, audit trail, simulated review state
+with no EHR write, active fixture source, and deterministic narrative fallback with
+no API key.
 
 If `GET /mcp` returns `406`, that does not by itself mean the MCP endpoint is broken. Use an MCP client, MCP Inspector, or the smoke script.
 
@@ -127,7 +130,9 @@ X-FHIR-Access-Token
 X-Patient-ID
 ```
 
-Tokens are not logged or returned. The app does not request `offline_access`, does not receive refresh tokens, and does not call an external FHIR server.
+Tokens are not logged or returned. `get_fhir_connection_status` reports token
+presence only as a boolean. The app does not request `offline_access`, does not
+receive refresh tokens, and does not call an external FHIR server in demo mode.
 
 ## Docker
 

@@ -19,7 +19,7 @@ The final URL should be replaced with the actual Render service URL if Render as
    ```
 3. Open Prompt Opinion and add the MCP server URL.
 4. Continue through initialization so Prompt Opinion can inspect capabilities.
-5. Confirm tool discovery lists the Sprint 7 workflow and AI narrative tools.
+5. Confirm tool discovery lists the final workflow, FHIR transparency, handoff, and AI narrative tools.
 6. Confirm the FHIR-context trust or extension toggle appears.
 7. Confirm all requested scopes are optional.
 8. Invoke `get_patient_snapshot` for `synthetic-patient-001`.
@@ -30,9 +30,11 @@ The final URL should be replaced with the actual Render service URL if Render as
 13. Invoke `list_follow_up_tasks` with the default profile.
 14. Invoke `explain_result_decisions` for `synthetic-patient-001`.
 15. Invoke `generate_ai_follow_up_brief` for `synthetic-patient-001`.
-16. Invoke `update_follow_up_task_status` for a demo task.
-17. Invoke `get_ehr_integration_summary`.
-18. Record any initialization, trust-toggle, header-forwarding, or timeout notes for demo rehearsal.
+16. Invoke `get_fhir_connection_status`.
+17. Invoke `create_follow_up_handoff_payload` for `synthetic-patient-003`.
+18. Invoke `update_follow_up_task_status` for a demo task.
+19. Invoke `get_ehr_integration_summary`.
+20. Record any initialization, trust-toggle, header-forwarding, or timeout notes for demo rehearsal.
 
 ## FHIR-Context Extension
 
@@ -66,12 +68,14 @@ Prompt Opinion should discover:
 - `list_rule_profiles`
 - `explain_result_decisions`
 - `list_follow_up_tasks`
+- `get_fhir_connection_status`
+- `create_follow_up_handoff_payload`
 - `update_follow_up_task_status`
 - `get_ehr_integration_summary`
 
 ## Synthetic Fixture Mode
 
-Sprint 7 defaults to synthetic fixture mode and LLM fallback mode. If Prompt Opinion does not pass FHIR headers during testing, the server still works against these fixture patients:
+Sprint 8 defaults to synthetic fixture mode and LLM fallback mode. If Prompt Opinion does not pass FHIR headers during testing, the server still works against these fixture patients:
 
 - `synthetic-patient-001`: unresolved A1c and LDL.
 - `synthetic-patient-003`: high potassium priority case.
@@ -85,6 +89,10 @@ If a user trusts the server and authorizes FHIR context, Prompt Opinion may pass
 - `X-Patient-ID`
 
 `X-Patient-ID` can select a synthetic fixture patient. Access tokens are never returned, and helper output redacts token values.
+
+Use `get_fhir_connection_status` when anyone asks whether the demo is fixture-backed
+or connected to a live FHIR server. The expected deployed demo source is
+`synthetic_fixture_data`.
 
 ## Demo Prompt
 
@@ -102,9 +110,17 @@ Expected behavior: the response includes narrative plus `structured_findings`,
 `priority`, `audit_summary`, `safety_validation`, and fallback metadata. In default
 Render mode, deterministic fallback is expected because no Gemini key is configured.
 
+```text
+Create a follow-up handoff payload for synthetic-patient-003 without sending it anywhere.
+```
+
+Expected behavior: the response includes `payload_only: true`,
+`required_human_review: true`, and `ehr_write_performed: false`.
+
 ## BYO Agent Safety Instructions
 
-Use a Prompt Opinion BYO agent instruction such as:
+Use the full instruction block in `docs/prompt_opinion_agent_instructions.md`, or a
+short Prompt Opinion BYO agent instruction such as:
 
 ```text
 Use Follow-Up Radar MCP tool output as clinical decision support only. Do not add diagnosis, prescribing, treatment-plan, therapy recommendation, medication-adjustment, or urgency instructions beyond the deterministic MCP output. Preserve the disclaimer and ask for clinician review.
@@ -130,11 +146,19 @@ Mark task-synthetic-patient-003-obs-potassium-003-2026-04-24 as reviewed in the 
 Summarize the EHR integration model for Follow-Up Radar.
 ```
 
+```text
+Show the FHIR connection status and explain whether live FHIR reads occurred.
+```
+
+```text
+Create a payload-only follow-up handoff for synthetic-patient-003.
+```
+
 ## Troubleshooting
 
 - Failed initialization: confirm the URL ends in `/mcp/` and the server is awake.
 - Missing FHIR-context toggle: run the smoke script and confirm initialize capabilities include `ai.promptopinion/fhir-context`.
-- Missing tools: open `/version` and verify the deployed code is version `0.7.0`.
+- Missing tools: open `/version` and verify the deployed code is version `0.8.0`.
 - Timeout: warm the deployment with `/healthz`, then retry initialization.
 - Plain `GET /mcp` returns `406`: use MCP Inspector or Prompt Opinion instead of a browser GET.
 - Wrong patient: pass `patient_id` as a tool argument, or pass `X-Patient-ID` when the client supports custom headers.

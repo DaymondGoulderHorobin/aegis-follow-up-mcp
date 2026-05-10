@@ -26,6 +26,8 @@ EXPECTED_TOOLS = {
     "list_rule_profiles",
     "explain_result_decisions",
     "list_follow_up_tasks",
+    "get_fhir_connection_status",
+    "create_follow_up_handoff_payload",
     "update_follow_up_task_status",
     "get_ehr_integration_summary",
 }
@@ -147,6 +149,14 @@ async def smoke_once(url: str, timeout: float, expect_real_llm: bool) -> dict[st
                 "reason": "Clinician reviewed during demo workflow.",
             },
         )
+        fhir_status = await client.call_tool(
+            "get_fhir_connection_status",
+            {"patient_id": "synthetic-patient-001"},
+        )
+        handoff = await client.call_tool(
+            "create_follow_up_handoff_payload",
+            {"patient_id": "synthetic-patient-003"},
+        )
         ai_brief = await client.call_tool(
             "generate_ai_follow_up_brief",
             {"patient_id": "synthetic-patient-001"},
@@ -159,6 +169,8 @@ async def smoke_once(url: str, timeout: float, expect_real_llm: bool) -> dict[st
     tasks_text = _content_to_text(tasks)
     audit_text = _content_to_text(audit)
     workflow_text = _content_to_text(workflow_update)
+    fhir_status_text = _content_to_text(fhir_status)
+    handoff_text = _content_to_text(handoff)
     ai_brief_text = _content_to_text(ai_brief)
     ehr_summary_text = _content_to_text(ehr_summary)
     _require_text(findings_text, "Hemoglobin A1c", "unresolved abnormal findings")
@@ -179,6 +191,11 @@ async def smoke_once(url: str, timeout: float, expect_real_llm: bool) -> dict[st
     _require_text(audit_text, "flagged", "audit trail")
     _require_text(workflow_text, "demo_state_only", "workflow update")
     _require_text(workflow_text, "ehr_write_performed", "workflow update")
+    _require_text(fhir_status_text, "synthetic_fixture_data", "FHIR connection status")
+    _require_text(fhir_status_text, "live_fhir_reads_enabled", "FHIR connection status")
+    _require_text(handoff_text, "handoff_payload_created", "handoff payload")
+    _require_text(handoff_text, "payload_only", "handoff payload")
+    _require_text(handoff_text, "ehr_write_performed", "handoff payload")
     _require_text(ai_brief_text, "Clinical decision support only", "AI follow-up brief")
     _require_text(ai_brief_text, "structured_findings", "AI follow-up brief")
     _require_text(ai_brief_text, "fallback_used", "AI follow-up brief")
@@ -209,6 +226,8 @@ async def smoke_once(url: str, timeout: float, expect_real_llm: bool) -> dict[st
             "list_follow_up_tasks",
             "explain_result_decisions",
             "update_follow_up_task_status",
+            "get_fhir_connection_status",
+            "create_follow_up_handoff_payload",
             "generate_ai_follow_up_brief",
             "get_ehr_integration_summary",
         ],
