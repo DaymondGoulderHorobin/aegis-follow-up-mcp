@@ -1,6 +1,6 @@
 # Commercial Workflow
 
-Follow-Up Radar is positioned as a deterministic follow-up safety layer that can sit between FHIR data and clinician-reviewed workflow action.
+Aegis Follow-Up is positioned as a deterministic follow-up safety layer that can sit between FHIR data and clinician-reviewed workflow action.
 
 Clinical decision support only. For clinician review. Not a diagnosis or treatment directive.
 

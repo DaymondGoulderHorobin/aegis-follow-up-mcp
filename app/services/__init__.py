@@ -1,1 +1,1 @@
-"""Service layer for Follow-Up Radar."""
+"""Service layer for Aegis Follow-Up."""

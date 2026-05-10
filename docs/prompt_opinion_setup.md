@@ -1,6 +1,6 @@
 # Prompt Opinion Setup
 
-Use the deployed `/mcp/` endpoint as a remote MCP server.
+Use the deployed `/mcp/` endpoint as the remote MCP server for Aegis Follow-Up.
 
 ## Server URL
 
@@ -75,7 +75,7 @@ Prompt Opinion should discover:
 
 ## Synthetic Fixture Mode
 
-Sprint 8 defaults to synthetic fixture mode and LLM fallback mode. If Prompt Opinion does not pass FHIR headers during testing, the server still works against these fixture patients:
+Aegis Follow-Up defaults to synthetic fixture mode and LLM fallback mode. If Prompt Opinion does not pass FHIR headers during testing, the server still works against these fixture patients:
 
 - `synthetic-patient-001`: unresolved A1c and LDL.
 - `synthetic-patient-003`: high potassium priority case.
@@ -123,7 +123,7 @@ Use the full instruction block in `docs/prompt_opinion_agent_instructions.md`, o
 short Prompt Opinion BYO agent instruction such as:
 
 ```text
-Use Follow-Up Radar MCP tool output as clinical decision support only. Do not add diagnosis, prescribing, treatment-plan, therapy recommendation, medication-adjustment, or urgency instructions beyond the deterministic MCP output. Preserve the disclaimer and ask for clinician review.
+Use Aegis Follow-Up MCP tool output as clinical decision support only. Do not add diagnosis, prescribing, treatment-plan, therapy recommendation, medication-adjustment, or urgency instructions beyond the deterministic MCP output. Preserve the disclaimer and ask for clinician review.
 ```
 
 The server itself validates clinician-facing text for disallowed recommendation phrases, but the BYO agent should still be instructed not to embellish tool results.
@@ -143,7 +143,7 @@ Mark task-synthetic-patient-003-obs-potassium-003-2026-04-24 as reviewed in the 
 ```
 
 ```text
-Summarize the EHR integration model for Follow-Up Radar.
+Summarize the EHR integration model for Aegis Follow-Up.
 ```
 
 ```text
@@ -158,7 +158,7 @@ Create a payload-only follow-up handoff for synthetic-patient-003.
 
 - Failed initialization: confirm the URL ends in `/mcp/` and the server is awake.
 - Missing FHIR-context toggle: run the smoke script and confirm initialize capabilities include `ai.promptopinion/fhir-context`.
-- Missing tools: open `/version` and verify the deployed code is version `0.8.0`.
+- Missing tools: open `/version` and verify the deployed code is version `0.9.0`.
 - Timeout: warm the deployment with `/healthz`, then retry initialization.
 - Plain `GET /mcp` returns `406`: use MCP Inspector or Prompt Opinion instead of a browser GET.
 - Wrong patient: pass `patient_id` as a tool argument, or pass `X-Patient-ID` when the client supports custom headers.

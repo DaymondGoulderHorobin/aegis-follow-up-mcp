@@ -1,8 +1,8 @@
-# Devpost Submission Copy
+# Submission Copy
 
 ## Project Name
 
-Follow-Up Radar MCP
+Aegis Follow-Up
 
 ## Tagline
 
@@ -10,61 +10,54 @@ Rules decide. AI synthesizes. Safety validates. Clinician remains in control.
 
 ## Short Description
 
-Follow-Up Radar is a Prompt Opinion-ready MCP server that reviews synthetic FHIR
-data for potentially unresolved abnormal results, explains deterministic audit
-decisions, prioritizes a follow-up queue, and optionally generates a guarded
-clinician-review narrative from the structured evidence.
+Aegis Follow-Up helps clinicians surface potentially unresolved abnormal results,
+understand why each result was flagged or suppressed, prioritize follow-up tasks,
+and generate guarded AI summaries for clinician review.
 
 ## What It Does
 
-The server exposes MCP tools for synthetic patient snapshots, observations,
-abnormal-result detection, deterministic follow-up briefs, rule-profile priority
-assessment, audit trail explanations, task queue workflow state, EHR integration
-positioning, FHIR connection transparency, payload-only agent handoff, and
-controlled AI narrative synthesis.
+Aegis Follow-Up is a Prompt Opinion-ready MCP server. It exposes tools for
+synthetic patient snapshots, observation review, abnormal-result detection,
+deterministic follow-up briefs, rule-profile priority assessment, audit trail
+explanations, task queue workflow state, FHIR connection transparency, payload-only
+agent handoff, EHR integration positioning, and controlled AI narrative synthesis.
 
 ## AI Factor
 
-The AI layer is intentionally constrained. Deterministic services decide the facts:
-which results are abnormal, which are suppressed by follow-up evidence, which
-priority tier applies, and which tasks are open. The optional Gemini path only
-synthesizes a short narrative from that structured output. Safety validation blocks
-unsafe recommendation wording and falls back to deterministic text when needed.
-The final demo shows the AI output beside the structured findings, priority, and
-audit summary so judges can see that the model is not the source of truth.
+The project uses two AI layers with a clear safety boundary. Prompt Opinion uses AI
+to interpret the user request and choose MCP tools. Aegis Follow-Up performs
+deterministic clinical review, then optionally calls Gemini to synthesize a concise
+narrative from structured deterministic evidence. Gemini cannot change findings,
+priority tiers, audit decisions, or task state. Safety validation blocks unsafe
+wording and falls back to deterministic text if needed.
 
-## Impact
+## Potential Impact
 
-The project demonstrates how an MCP server could help a care team spot follow-up
-gaps without replacing clinician judgment. The workflow is designed around audit
-evidence, task review, and clinician confirmation before any production EHR action.
-The handoff payload shows how the same result could later move into scheduling,
-care coordination, or EHR-task workflows after human review.
+Abnormal result follow-up is a real care-operations problem. Aegis Follow-Up shows
+how an MCP server can turn patient-context data into an auditable follow-up queue,
+explain why each result needs review, and prepare payloads that future scheduling or
+care-coordination agents could consume after human review.
 
 ## Feasibility
 
 The demo is deployable today as a Docker-backed Render service with health checks,
 smoke tests, Prompt Opinion FHIR-context capability advertising, fixture-mode
-fallback, and no required secrets. The path to production would add real FHIR reads,
-persistent audit storage, HIPAA-eligible hosting, access controls, and reviewed EHR
-write workflows.
-`get_fhir_connection_status` makes the current demo boundary explicit by reporting
-fixture mode and active data source instead of implying live FHIR reads.
+fallback, optional Gemini narrative mode, and no required secrets for the default
+demo. The path to production is clear: HIPAA-eligible hosting, BAA coverage,
+persistent audit storage, tenant-aware access controls, monitoring, security review,
+and explicitly reviewed EHR write workflows.
 
 ## Safety
 
-This build uses synthetic data only. It does not contain PHI, does not request
-`offline_access`, does not handle refresh tokens, does not perform real FHIR or EHR
-writes, and does not diagnose, prescribe, or issue treatment directives.
-The handoff payload is schema/demo output only and does not contact another agent.
+The hackathon demo uses synthetic fixture data only. It does not contain PHI, does
+not request `offline_access`, does not handle refresh tokens, does not perform real
+FHIR reads by default, does not write to an EHR, does not contact another agent, and
+does not diagnose, prescribe, or issue treatment directives.
 
 ## Demo Flow
 
-1. Show Prompt Opinion or MCP Inspector connected to the deployed `/mcp/` endpoint.
-2. List follow-up tasks and show the priority queue.
-3. Explain deterministic decisions for `synthetic-patient-001`.
-4. Show FHIR connection status and active fixture data source.
-5. Generate the AI follow-up brief and show narrative plus structured evidence.
-6. Show safety validation and fallback fields.
-7. Create the payload-only handoff for `synthetic-patient-003`.
-8. Show the EHR integration summary with dynamic workflow metrics.
+1. Show `get_fhir_connection_status` and confirm synthetic fixture mode.
+2. Show `list_follow_up_tasks` and the high-priority potassium case.
+3. Show `explain_result_decisions` and `assess_follow_up_priority`.
+4. Show `generate_ai_follow_up_brief` with structured evidence beside the narrative.
+5. Show `create_follow_up_handoff_payload` with payload-only safety flags.

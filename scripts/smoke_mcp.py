@@ -1,4 +1,4 @@
-"""Smoke-test a running Follow-Up Radar MCP endpoint."""
+"""Smoke-test a running Aegis Follow-Up MCP endpoint."""
 
 from __future__ import annotations
 
