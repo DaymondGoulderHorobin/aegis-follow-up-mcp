@@ -39,6 +39,7 @@ In Inspector:
    - `get_recent_observations`
    - `find_unresolved_abnormal_results`
    - `generate_follow_up_brief`
+   - `generate_ai_follow_up_brief`
    - `draft_clinician_note`
    - `assess_follow_up_priority`
    - `list_rule_profiles`
@@ -63,7 +64,11 @@ In Inspector:
    ```json
    {"patient_id": "synthetic-patient-001"}
    ```
-10. Call `update_follow_up_task_status` with:
+10. Call `generate_ai_follow_up_brief` with:
+   ```json
+   {"patient_id": "synthetic-patient-001", "profile_id": "default_primary_care"}
+   ```
+11. Call `update_follow_up_task_status` with:
    ```json
    {
      "task_id": "task-synthetic-patient-003-obs-potassium-003-2026-04-24",
@@ -72,7 +77,7 @@ In Inspector:
    }
    ```
 
-Expected result: the first patient has unresolved A1c and LDL findings, while potassium is suppressed because the synthetic bundle includes follow-up evidence. The critical synthetic patient returns `same_day_clinician_review_consideration`, and the workflow update states that no EHR write was performed.
+Expected result: the first patient has unresolved A1c and LDL findings, while potassium is suppressed because the synthetic bundle includes follow-up evidence. The AI brief includes narrative plus `structured_findings`, `priority`, `audit_summary`, and fallback/safety fields. The critical synthetic patient returns `same_day_clinician_review_consideration`, and the workflow update states that no EHR write was performed.
 
 ## Initialize Capabilities
 
@@ -114,4 +119,4 @@ With the server running:
 python scripts/smoke_mcp.py --url http://127.0.0.1:8000/mcp/
 ```
 
-The script initializes the MCP client, validates the Prompt Opinion FHIR-context extension payload, lists tools, and calls the priority, task queue, audit trail, and demo workflow tools against synthetic fixture mode.
+The script initializes the MCP client, validates the Prompt Opinion FHIR-context extension payload, lists tools, and calls the priority, task queue, audit trail, AI brief fallback, EHR summary, and demo workflow tools against synthetic fixture mode.

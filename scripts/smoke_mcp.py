@@ -20,6 +20,7 @@ EXPECTED_TOOLS = {
     "get_recent_observations",
     "find_unresolved_abnormal_results",
     "generate_follow_up_brief",
+    "generate_ai_follow_up_brief",
     "draft_clinician_note",
     "assess_follow_up_priority",
     "list_rule_profiles",
@@ -111,7 +112,7 @@ def _validate_prompt_opinion_extension(initialize_result: Any) -> dict[str, Any]
     }
 
 
-async def smoke_once(url: str, timeout: float) -> dict[str, Any]:
+async def smoke_once(url: str, timeout: float, expect_real_llm: bool) -> dict[str, Any]:
     async with Client(url, timeout=timeout, init_timeout=timeout) as client:
         initialize_result = client.initialize_result or await client.initialize()
         extension_summary = _validate_prompt_opinion_extension(initialize_result)
@@ -146,6 +147,11 @@ async def smoke_once(url: str, timeout: float) -> dict[str, Any]:
                 "reason": "Clinician reviewed during demo workflow.",
             },
         )
+        ai_brief = await client.call_tool(
+            "generate_ai_follow_up_brief",
+            {"patient_id": "synthetic-patient-001"},
+        )
+        ehr_summary = await client.call_tool("get_ehr_integration_summary", {})
 
     findings_text = _content_to_text(findings)
     brief_text = _content_to_text(brief)
@@ -153,6 +159,8 @@ async def smoke_once(url: str, timeout: float) -> dict[str, Any]:
     tasks_text = _content_to_text(tasks)
     audit_text = _content_to_text(audit)
     workflow_text = _content_to_text(workflow_update)
+    ai_brief_text = _content_to_text(ai_brief)
+    ehr_summary_text = _content_to_text(ehr_summary)
     _require_text(findings_text, "Hemoglobin A1c", "unresolved abnormal findings")
     _require_text(findings_text, "LDL cholesterol", "unresolved abnormal findings")
     _require_text(brief_text, "Clinical decision support only", "follow-up brief")
@@ -171,6 +179,23 @@ async def smoke_once(url: str, timeout: float) -> dict[str, Any]:
     _require_text(audit_text, "flagged", "audit trail")
     _require_text(workflow_text, "demo_state_only", "workflow update")
     _require_text(workflow_text, "ehr_write_performed", "workflow update")
+    _require_text(ai_brief_text, "Clinical decision support only", "AI follow-up brief")
+    _require_text(ai_brief_text, "structured_findings", "AI follow-up brief")
+    _require_text(ai_brief_text, "fallback_used", "AI follow-up brief")
+    if expect_real_llm:
+        _require_text(
+            ai_brief_text,
+            "llm_generated_with_deterministic_guardrails",
+            "AI follow-up brief",
+        )
+    else:
+        _require_text(
+            ai_brief_text,
+            "deterministic_fallback_with_guardrails",
+            "AI follow-up brief",
+        )
+    _require_text(ehr_summary_text, "workflow_metrics", "EHR integration summary")
+    _require_text(ehr_summary_text, "task_counts_by_priority", "EHR integration summary")
 
     return {
         "endpoint": url,
@@ -184,17 +209,25 @@ async def smoke_once(url: str, timeout: float) -> dict[str, Any]:
             "list_follow_up_tasks",
             "explain_result_decisions",
             "update_follow_up_task_status",
+            "generate_ai_follow_up_brief",
+            "get_ehr_integration_summary",
         ],
     }
 
 
-async def smoke(url: str, attempts: int, delay_seconds: float, timeout: float) -> None:
+async def smoke(
+    url: str,
+    attempts: int,
+    delay_seconds: float,
+    timeout: float,
+    expect_real_llm: bool,
+) -> None:
     normalized_url = _normalize_mcp_url(url)
     result: dict[str, Any] = {}
 
     async def run_once() -> None:
         nonlocal result
-        result = await smoke_once(normalized_url, timeout)
+        result = await smoke_once(normalized_url, timeout, expect_real_llm)
 
     await _with_retries(run_once, attempts, delay_seconds)
     print("MCP smoke check passed.")
@@ -207,8 +240,21 @@ def main() -> None:
     parser.add_argument("--attempts", type=int, default=3)
     parser.add_argument("--delay-seconds", type=float, default=2.0)
     parser.add_argument("--timeout", type=float, default=30.0)
+    parser.add_argument(
+        "--expect-real-llm",
+        action="store_true",
+        help="Require the AI brief to use a configured real LLM instead of fallback mode.",
+    )
     args = parser.parse_args()
-    asyncio.run(smoke(args.url, args.attempts, args.delay_seconds, args.timeout))
+    asyncio.run(
+        smoke(
+            args.url,
+            args.attempts,
+            args.delay_seconds,
+            args.timeout,
+            args.expect_real_llm,
+        )
+    )
 
 
 if __name__ == "__main__":

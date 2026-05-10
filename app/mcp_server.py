@@ -17,6 +17,7 @@ from app.prompt_opinion.fhir_context_extension import (
     install_fhir_context_extension,
 )
 from app.services.abnormal_results import find_unresolved_abnormal_results as find_results
+from app.services.ai_follow_up_brief import generate_ai_follow_up_brief as build_ai_brief
 from app.services.audit_trail import explain_result_decisions as build_audit_trail
 from app.services.brief_generator import generate_follow_up_brief as build_brief
 from app.services.ehr_integration import get_ehr_integration_summary as build_ehr_summary
@@ -93,6 +94,19 @@ def generate_follow_up_brief(patient_id: str | None = None) -> dict[str, Any]:
     """Generate a deterministic clinician-facing follow-up brief."""
 
     return build_brief(patient_id=resolve_patient_id(patient_id))
+
+
+@_register_tool
+def generate_ai_follow_up_brief(
+    patient_id: str | None = None,
+    profile_id: str = "default_primary_care",
+) -> dict[str, Any]:
+    """Generate an optional AI narrative with deterministic guardrails and fallback."""
+
+    return build_ai_brief(
+        patient_id=resolve_patient_id(patient_id),
+        profile_id=profile_id,
+    )
 
 
 @_register_tool

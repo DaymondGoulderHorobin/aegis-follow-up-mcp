@@ -2,12 +2,16 @@
 
 from __future__ import annotations
 
+import re
 from collections.abc import Iterable, Mapping
 from typing import Any
 
 from app.safety.disclaimers import CLINICIAN_REVIEW_DISCLAIMER
 
 DISALLOWED_CLINICAL_RECOMMENDATION_PHRASES: tuple[str, ...] = (
+    "diagnosis",
+    "treat",
+    "therapy",
     "diagnosed with",
     "prescribe",
     "start treatment",
@@ -16,17 +20,28 @@ DISALLOWED_CLINICAL_RECOMMENDATION_PHRASES: tuple[str, ...] = (
     "medication adjustment",
     "lipid-lowering therapy",
     "therapy may be warranted",
+    "requires treatment",
+)
+
+_DISALLOWED_CLINICAL_RECOMMENDATION_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = tuple(
+    (phrase, re.compile(rf"\b{re.escape(phrase)}\b", re.IGNORECASE))
+    for phrase in DISALLOWED_CLINICAL_RECOMMENDATION_PHRASES
 )
 
 
 def find_disallowed_clinical_phrases(text: str) -> list[str]:
     """Return disallowed clinical recommendation phrases found in text."""
 
-    normalized_text = text.casefold()
+    validated_text = re.sub(
+        re.escape(CLINICIAN_REVIEW_DISCLAIMER),
+        "",
+        text,
+        flags=re.IGNORECASE,
+    )
     return [
         phrase
-        for phrase in DISALLOWED_CLINICAL_RECOMMENDATION_PHRASES
-        if phrase.casefold() in normalized_text
+        for phrase, pattern in _DISALLOWED_CLINICAL_RECOMMENDATION_PATTERNS
+        if pattern.search(validated_text)
     ]
 
 
@@ -63,7 +78,9 @@ def _iter_string_values(value: Any) -> Iterable[str]:
     if isinstance(value, str):
         yield value
     elif isinstance(value, Mapping):
-        for child in value.values():
+        for key, child in value.items():
+            if key == "blocked_phrases":
+                continue
             yield from _iter_string_values(child)
     elif isinstance(value, list | tuple):
         for child in value:

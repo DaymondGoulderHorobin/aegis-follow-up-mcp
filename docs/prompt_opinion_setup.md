@@ -19,7 +19,7 @@ The final URL should be replaced with the actual Render service URL if Render as
    ```
 3. Open Prompt Opinion and add the MCP server URL.
 4. Continue through initialization so Prompt Opinion can inspect capabilities.
-5. Confirm tool discovery lists the Sprint 6 workflow tools.
+5. Confirm tool discovery lists the Sprint 7 workflow and AI narrative tools.
 6. Confirm the FHIR-context trust or extension toggle appears.
 7. Confirm all requested scopes are optional.
 8. Invoke `get_patient_snapshot` for `synthetic-patient-001`.
@@ -29,9 +29,10 @@ The final URL should be replaced with the actual Render service URL if Render as
 12. Invoke `assess_follow_up_priority` for `synthetic-patient-004`.
 13. Invoke `list_follow_up_tasks` with the default profile.
 14. Invoke `explain_result_decisions` for `synthetic-patient-001`.
-15. Invoke `update_follow_up_task_status` for a demo task.
-16. Invoke `get_ehr_integration_summary`.
-17. Record any initialization, trust-toggle, header-forwarding, or timeout notes for demo rehearsal.
+15. Invoke `generate_ai_follow_up_brief` for `synthetic-patient-001`.
+16. Invoke `update_follow_up_task_status` for a demo task.
+17. Invoke `get_ehr_integration_summary`.
+18. Record any initialization, trust-toggle, header-forwarding, or timeout notes for demo rehearsal.
 
 ## FHIR-Context Extension
 
@@ -59,6 +60,7 @@ Prompt Opinion should discover:
 - `get_recent_observations`
 - `find_unresolved_abnormal_results`
 - `generate_follow_up_brief`
+- `generate_ai_follow_up_brief`
 - `draft_clinician_note`
 - `assess_follow_up_priority`
 - `list_rule_profiles`
@@ -69,7 +71,7 @@ Prompt Opinion should discover:
 
 ## Synthetic Fixture Mode
 
-Sprint 6 defaults to synthetic fixture mode. If Prompt Opinion does not pass FHIR headers during testing, the server still works against these fixture patients:
+Sprint 7 defaults to synthetic fixture mode and LLM fallback mode. If Prompt Opinion does not pass FHIR headers during testing, the server still works against these fixture patients:
 
 - `synthetic-patient-001`: unresolved A1c and LDL.
 - `synthetic-patient-003`: high potassium priority case.
@@ -91,6 +93,14 @@ Check synthetic-patient-001 for unresolved abnormal results and draft a follow-u
 ```
 
 Expected behavior: unresolved A1c and LDL findings appear with evidence and clinician review actions. Potassium is not returned as unresolved because follow-up evidence exists in the synthetic fixture.
+
+```text
+Generate an AI follow-up brief for synthetic-patient-001 and show the deterministic evidence fields.
+```
+
+Expected behavior: the response includes narrative plus `structured_findings`,
+`priority`, `audit_summary`, `safety_validation`, and fallback metadata. In default
+Render mode, deterministic fallback is expected because no Gemini key is configured.
 
 ## BYO Agent Safety Instructions
 
@@ -124,7 +134,7 @@ Summarize the EHR integration model for Follow-Up Radar.
 
 - Failed initialization: confirm the URL ends in `/mcp/` and the server is awake.
 - Missing FHIR-context toggle: run the smoke script and confirm initialize capabilities include `ai.promptopinion/fhir-context`.
-- Missing tools: open `/version` and verify the deployed code is version `0.6.0`.
+- Missing tools: open `/version` and verify the deployed code is version `0.7.0`.
 - Timeout: warm the deployment with `/healthz`, then retry initialization.
 - Plain `GET /mcp` returns `406`: use MCP Inspector or Prompt Opinion instead of a browser GET.
 - Wrong patient: pass `patient_id` as a tool argument, or pass `X-Patient-ID` when the client supports custom headers.

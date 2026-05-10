@@ -13,6 +13,7 @@ def test_safety_validator_flags_disallowed_recommendation_phrases() -> None:
     text = "The patient should start lipid-lowering therapy."
 
     assert find_disallowed_clinical_phrases(text) == [
+        "therapy",
         "should start",
         "lipid-lowering therapy",
     ]
@@ -44,3 +45,7 @@ def test_payload_validation_requires_disclaimer_and_checks_nested_text() -> None
 def test_payload_validation_rejects_missing_disclaimer() -> None:
     with pytest.raises(ValueError):
         assert_disclaimer_present({"summary": "Clinician review only."})
+
+
+def test_safety_validator_allows_shared_disclaimer() -> None:
+    assert find_disallowed_clinical_phrases(CLINICIAN_REVIEW_DISCLAIMER) == []
