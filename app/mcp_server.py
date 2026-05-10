@@ -21,8 +21,12 @@ from app.services.ai_follow_up_brief import generate_ai_follow_up_brief as build
 from app.services.audit_trail import explain_result_decisions as build_audit_trail
 from app.services.brief_generator import generate_follow_up_brief as build_brief
 from app.services.ehr_integration import get_ehr_integration_summary as build_ehr_summary
+from app.services.fhir_connection_status import (
+    get_fhir_connection_status as build_fhir_status,
+)
 from app.services.follow_up_priority import assess_follow_up_priority as build_priority
 from app.services.follow_up_tasks import list_follow_up_tasks as build_task_queue
+from app.services.handoff_payload import create_follow_up_handoff_payload as build_handoff
 from app.services.note_drafter import draft_clinician_note as build_note
 from app.services.observations import get_recent_observations as build_observations
 from app.services.patient_snapshot import get_patient_snapshot as build_snapshot
@@ -154,6 +158,26 @@ def list_follow_up_tasks(
     """Return a priority-grouped synthetic follow-up task queue."""
 
     return build_task_queue(profile_id=profile_id, patient_ids=patient_ids)
+
+
+@_register_tool
+def get_fhir_connection_status(patient_id: str | None = None) -> dict[str, Any]:
+    """Report fixture-versus-FHIR context status without live reads."""
+
+    return build_fhir_status(patient_id=patient_id)
+
+
+@_register_tool
+def create_follow_up_handoff_payload(
+    patient_id: str | None = "synthetic-patient-003",
+    profile_id: str = "default_primary_care",
+) -> dict[str, Any]:
+    """Create a payload-only follow-up handoff for future agent workflows."""
+
+    return build_handoff(
+        patient_id=patient_id,
+        profile_id=profile_id,
+    )
 
 
 @_register_tool

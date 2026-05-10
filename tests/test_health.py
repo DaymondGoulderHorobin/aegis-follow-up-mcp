@@ -14,6 +14,8 @@ EXPECTED_TOOLS = {
     "list_rule_profiles",
     "explain_result_decisions",
     "list_follow_up_tasks",
+    "get_fhir_connection_status",
+    "create_follow_up_handoff_payload",
     "update_follow_up_task_status",
     "get_ehr_integration_summary",
 }
@@ -41,7 +43,7 @@ def test_version() -> None:
 
     assert response.status_code == 200
     assert response.json()["project"] == "Follow-Up Radar MCP"
-    assert response.json()["version"] == "0.7.0"
+    assert response.json()["version"] == "0.8.0"
     assert response.json()["mcp_transport"] == "streamable-http"
 
 

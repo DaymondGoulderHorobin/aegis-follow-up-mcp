@@ -45,6 +45,8 @@ In Inspector:
    - `list_rule_profiles`
    - `explain_result_decisions`
    - `list_follow_up_tasks`
+   - `get_fhir_connection_status`
+   - `create_follow_up_handoff_payload`
    - `update_follow_up_task_status`
    - `get_ehr_integration_summary`
 5. Call `find_unresolved_abnormal_results` with:
@@ -68,7 +70,15 @@ In Inspector:
    ```json
    {"patient_id": "synthetic-patient-001", "profile_id": "default_primary_care"}
    ```
-11. Call `update_follow_up_task_status` with:
+11. Call `get_fhir_connection_status` with:
+   ```json
+   {"patient_id": "synthetic-patient-001"}
+   ```
+12. Call `create_follow_up_handoff_payload` with:
+   ```json
+   {"patient_id": "synthetic-patient-003", "profile_id": "default_primary_care"}
+   ```
+13. Call `update_follow_up_task_status` with:
    ```json
    {
      "task_id": "task-synthetic-patient-003-obs-potassium-003-2026-04-24",
@@ -77,7 +87,7 @@ In Inspector:
    }
    ```
 
-Expected result: the first patient has unresolved A1c and LDL findings, while potassium is suppressed because the synthetic bundle includes follow-up evidence. The AI brief includes narrative plus `structured_findings`, `priority`, `audit_summary`, and fallback/safety fields. The critical synthetic patient returns `same_day_clinician_review_consideration`, and the workflow update states that no EHR write was performed.
+Expected result: the first patient has unresolved A1c and LDL findings, while potassium is suppressed because the synthetic bundle includes follow-up evidence. The AI brief includes narrative plus `structured_findings`, `priority`, `audit_summary`, and fallback/safety fields. The FHIR status reports `synthetic_fixture_data` for the demo. The handoff payload is `payload_only` and does not perform an outbound action. The critical synthetic patient returns `same_day_clinician_review_consideration`, and the workflow update states that no EHR write was performed.
 
 ## Initialize Capabilities
 
@@ -109,7 +119,7 @@ X-FHIR-Server-URL: https://example.fhir.test
 X-FHIR-Access-Token: synthetic-token-for-local-testing
 ```
 
-Then call `get_patient_snapshot` without a `patient_id` argument. The tool should select `synthetic-patient-002`. Token values are parsed in memory only and are not logged or returned.
+Then call `get_patient_snapshot` without a `patient_id` argument. The tool should select `synthetic-patient-002`. Call `get_fhir_connection_status` to show header presence without returning token values. Token values are parsed in memory only and are not logged or returned.
 
 ## Scripted Smoke Check
 
@@ -119,4 +129,4 @@ With the server running:
 python scripts/smoke_mcp.py --url http://127.0.0.1:8000/mcp/
 ```
 
-The script initializes the MCP client, validates the Prompt Opinion FHIR-context extension payload, lists tools, and calls the priority, task queue, audit trail, AI brief fallback, EHR summary, and demo workflow tools against synthetic fixture mode.
+The script initializes the MCP client, validates the Prompt Opinion FHIR-context extension payload, lists tools, and calls the priority, task queue, audit trail, FHIR status, handoff payload, AI brief fallback, EHR summary, and demo workflow tools against synthetic fixture mode.

@@ -18,6 +18,8 @@ services:
         value: "true"
       - key: FHIR_SYNTHETIC_BUNDLE_PATH
         value: data/synthetic_patient_bundle.json
+      - key: LIVE_FHIR_READS_ENABLED
+        value: "false"
       - key: HOST
         value: 0.0.0.0
       - key: PORT

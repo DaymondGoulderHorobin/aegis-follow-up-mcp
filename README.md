@@ -11,7 +11,7 @@ Clinical decision support only. For clinician review. Not a diagnosis or treatme
 - Data mode: synthetic FHIR fixtures only
 - Target MCP endpoint: `/mcp/`
 - Health endpoints: `/healthz`, `/readyz`, `/version`
-- Current version: `0.7.0`
+- Current version: `0.8.0`
 
 ## Local Setup
 
@@ -86,6 +86,8 @@ The server exposes these MCP tools:
 - `list_rule_profiles`
 - `explain_result_decisions`
 - `list_follow_up_tasks`
+- `get_fhir_connection_status`
+- `create_follow_up_handoff_payload`
 - `update_follow_up_task_status`
 - `get_ehr_integration_summary`
 
@@ -116,11 +118,18 @@ Sprint 7 adds a controlled AI narrative layer:
 - unsafe model wording is blocked and replaced with deterministic fallback text
 - the AI response always includes structured evidence beside the narrative
 
+Sprint 8 adds final integration transparency:
+
+- `get_fhir_connection_status` reports fixture mode, FHIR header presence, and active data source without returning tokens
+- `create_follow_up_handoff_payload` returns an A2A-style payload only; it does not contact another agent or write to an EHR
+- final Prompt Opinion agent instructions and demo copy make the fixture-versus-live-FHIR boundary explicit
+
 For MCP Inspector and deployment guidance, see:
 
 - `docs/mcp_inspector.md`
 - `docs/deployment.md`
 - `docs/prompt_opinion_setup.md`
+- `docs/prompt_opinion_agent_instructions.md`
 - `docs/commercial_workflow.md`
 
 ## Prompt Opinion Integration Notes
@@ -141,8 +150,10 @@ Requested SMART scopes are optional by default:
 - `patient/Encounter.rs`
 
 The server does not request `offline_access`, does not handle refresh tokens, and does
-not fetch real FHIR data. The optional Sprint 7 LLM path only synthesizes narrative
-from deterministic structured output.
+not fetch real FHIR data in the demo path. `get_fhir_connection_status` makes this
+transparent by reporting `synthetic_fixture_data` as the active source unless a future
+production mode explicitly enables live reads. The optional LLM path only synthesizes
+narrative from deterministic structured output.
 
 If a Prompt Opinion user trusts the server and authorizes FHIR context, these headers may be sent to tool calls:
 
@@ -151,6 +162,23 @@ If a Prompt Opinion user trusts the server and authorizes FHIR context, these he
 - `X-Patient-ID`
 
 If any required context is missing, the app uses fixture mode.
+
+## Final Architecture Summary
+
+```text
+Prompt Opinion / MCP client
+-> optional FHIR-context headers
+-> synthetic fixture data in demo mode
+-> deterministic abnormal-result review
+-> audit trail, priority queue, and rule profile context
+-> optional guarded AI narrative
+-> payload-only handoff schema
+-> clinician review remains required
+```
+
+The handoff payload is designed for future scheduling, care-coordination, or EHR-task
+agents. In this repository it is schema/demo output only and always returns
+`payload_only: true`, `required_human_review: true`, and `ehr_write_performed: false`.
 
 ## Synthetic Data And Safety
 
