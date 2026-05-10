@@ -22,6 +22,11 @@ EXPECTED_TOOLS = {
     "generate_follow_up_brief",
     "draft_clinician_note",
     "assess_follow_up_priority",
+    "list_rule_profiles",
+    "explain_result_decisions",
+    "list_follow_up_tasks",
+    "update_follow_up_task_status",
+    "get_ehr_integration_summary",
 }
 
 
@@ -128,10 +133,26 @@ async def smoke_once(url: str, timeout: float) -> dict[str, Any]:
             "assess_follow_up_priority",
             {"patient_id": "synthetic-patient-003"},
         )
+        tasks = await client.call_tool("list_follow_up_tasks", {})
+        audit = await client.call_tool(
+            "explain_result_decisions",
+            {"patient_id": "synthetic-patient-001"},
+        )
+        workflow_update = await client.call_tool(
+            "update_follow_up_task_status",
+            {
+                "task_id": "task-synthetic-patient-003-obs-potassium-003-2026-04-24",
+                "status": "reviewed",
+                "reason": "Clinician reviewed during demo workflow.",
+            },
+        )
 
     findings_text = _content_to_text(findings)
     brief_text = _content_to_text(brief)
     priority_text = _content_to_text(priority)
+    tasks_text = _content_to_text(tasks)
+    audit_text = _content_to_text(audit)
+    workflow_text = _content_to_text(workflow_update)
     _require_text(findings_text, "Hemoglobin A1c", "unresolved abnormal findings")
     _require_text(findings_text, "LDL cholesterol", "unresolved abnormal findings")
     _require_text(brief_text, "Clinical decision support only", "follow-up brief")
@@ -140,6 +161,16 @@ async def smoke_once(url: str, timeout: float) -> dict[str, Any]:
         "same_day_clinician_review_consideration",
         "follow-up priority assessment",
     )
+    _require_text(tasks_text, "synthetic-patient-003", "follow-up task queue")
+    _require_text(
+        tasks_text,
+        "same_day_clinician_review_consideration",
+        "follow-up task queue",
+    )
+    _require_text(audit_text, "Hemoglobin A1c", "audit trail")
+    _require_text(audit_text, "flagged", "audit trail")
+    _require_text(workflow_text, "demo_state_only", "workflow update")
+    _require_text(workflow_text, "ehr_write_performed", "workflow update")
 
     return {
         "endpoint": url,
@@ -150,6 +181,9 @@ async def smoke_once(url: str, timeout: float) -> dict[str, Any]:
             "find_unresolved_abnormal_results",
             "generate_follow_up_brief",
             "assess_follow_up_priority",
+            "list_follow_up_tasks",
+            "explain_result_decisions",
+            "update_follow_up_task_status",
         ],
     }
 

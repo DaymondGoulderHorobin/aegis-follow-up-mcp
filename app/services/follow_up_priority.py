@@ -12,6 +12,12 @@ from app.safety.output_validation import (
 )
 from app.services.abnormal_results import find_unresolved_abnormal_results
 from app.services.patient_snapshot import get_patient_snapshot
+from app.services.rule_profiles import (
+    DEFAULT_PROFILE_ID,
+    get_rule_profile,
+    highest_priority,
+    priority_override_for_display,
+)
 
 PriorityTier = Literal[
     "same_day_clinician_review_consideration",
@@ -26,29 +32,45 @@ NEUTRAL_REVIEW_ACTION = (
 )
 
 
-def assess_follow_up_priority(patient_id: str | None = None) -> dict[str, Any]:
+def assess_follow_up_priority(
+    patient_id: str | None = None,
+    profile_id: str = DEFAULT_PROFILE_ID,
+) -> dict[str, Any]:
     """Assess deterministic clinician-review priority for unresolved abnormal results."""
 
+    profile = get_rule_profile(profile_id)
     patient = get_patient_snapshot(patient_id=patient_id)
     findings = find_unresolved_abnormal_results(patient_id=patient.patient_id)
-    priority_tier = _priority_tier(findings)
+    priority_tier = _priority_tier(findings, profile_id=profile["profile_id"])
     payload = {
         "disclaimer": CLINICIAN_REVIEW_DISCLAIMER,
         "patient_id": patient.patient_id,
+        "profile_id": profile["profile_id"],
         "priority_tier": priority_tier,
         "summary": _summary(priority_tier, findings),
         "rationale": _rationale(priority_tier, findings),
         "findings": [finding.model_dump() for finding in findings],
-        "suggested_clinician_review_actions": _suggested_actions(findings),
+        "suggested_clinician_review_actions": _suggested_actions(findings, profile),
     }
     assert_disclaimer_present(payload)
     assert_clinician_facing_payload_safe(payload)
     return payload
 
 
-def _priority_tier(findings: list[AbnormalFinding]) -> PriorityTier:
+def _priority_tier(
+    findings: list[AbnormalFinding],
+    profile_id: str = DEFAULT_PROFILE_ID,
+) -> PriorityTier:
     if not findings:
         return "no_unresolved_abnormal_result_found"
+    overridden_tiers = [
+        override
+        for finding in findings
+        for override in [priority_override_for_display(finding.display, profile_id)]
+        if override
+    ]
+    if overridden_tiers:
+        return highest_priority(overridden_tiers)  # type: ignore[return-value]
     if any(_is_high_potassium(finding) for finding in findings):
         return "same_day_clinician_review_consideration"
     if any(finding.severity == "high" for finding in findings):
@@ -98,7 +120,12 @@ def _rationale(priority_tier: PriorityTier, findings: list[AbnormalFinding]) -> 
     return rationale
 
 
-def _suggested_actions(findings: list[AbnormalFinding]) -> list[str]:
+def _suggested_actions(
+    findings: list[AbnormalFinding],
+    profile: dict[str, Any] | None = None,
+) -> list[str]:
     if not findings:
         return []
+    if profile and profile.get("safety_language"):
+        return [str(profile["safety_language"])]
     return [NEUTRAL_REVIEW_ACTION]

@@ -1,6 +1,6 @@
-# Sprint 5 Demo Script
+# Sprint 6 Demo Script
 
-Goal: show Prompt Opinion or MCP Inspector discovering Follow-Up Radar and producing deterministic multi-patient follow-up triage from synthetic FHIR data in under four minutes.
+Goal: show Prompt Opinion or MCP Inspector discovering Follow-Up Radar and producing a deterministic clinical workflow layer from synthetic FHIR data in under five minutes.
 
 Target deployed MCP URL:
 
@@ -16,16 +16,16 @@ https://follow-up-radar-mcp.onrender.com/mcp/
    python scripts/smoke_mcp.py --url https://follow-up-radar-mcp.onrender.com/mcp/
    ```
 3. Connect MCP Inspector or Prompt Opinion to `/mcp/`.
-4. Show the six registered tools.
-5. Call `find_unresolved_abnormal_results` for `synthetic-patient-001`.
-6. Call `generate_follow_up_brief` for the same patient.
-7. Show the A1c and LDL findings, evidence, severity, and clinician review action.
-8. Point out that potassium is excluded because deterministic follow-up evidence exists.
-9. Call `assess_follow_up_priority` for `synthetic-patient-003`.
-10. Show `same_day_clinician_review_consideration` for the high potassium fixture case.
-11. Call `assess_follow_up_priority` for `synthetic-patient-004`.
-12. Show `no_unresolved_abnormal_result_found` for the clean chart fixture case.
-13. Close with: Clinical decision support only. For clinician review. Not a diagnosis or treatment directive.
+4. Show the registered tools, including the Sprint 6 workflow tools.
+5. Call `list_follow_up_tasks` with the default primary care profile.
+6. Show `synthetic-patient-003` in `same_day_clinician_review_consideration`.
+7. Show `synthetic-patient-001` in `soon_clinician_review_consideration`.
+8. Call `explain_result_decisions` for `synthetic-patient-001`.
+9. Show flagged A1c and LDL decisions plus the suppressed potassium follow-up evidence.
+10. Call `update_follow_up_task_status` for the synthetic-patient-003 potassium task with status `reviewed`.
+11. Show `demo_state_only: true` and `ehr_write_performed: false`.
+12. Call `get_ehr_integration_summary`.
+13. Close with: FHIR context in, deterministic review, clinician-reviewed task or note out.
 
 ## Sample Prompt Opinion Ask
 
@@ -34,6 +34,14 @@ Check this synthetic patient for unresolved abnormal results and draft a follow-
 Assess follow-up priority for synthetic-patient-003 and explain the deterministic rationale without adding clinical recommendations.
 
 Assess follow-up priority for synthetic-patient-004.
+
+List the follow-up task queue using the default primary care profile.
+
+Explain why synthetic-patient-001 was flagged or suppressed.
+
+Mark task-synthetic-patient-003-obs-potassium-003-2026-04-24 as reviewed in the demo workflow.
+
+Summarize the EHR integration model for this MCP server.
 
 ## Rehearsal Check
 

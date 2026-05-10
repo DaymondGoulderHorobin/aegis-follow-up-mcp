@@ -18,7 +18,7 @@ if load_dotenv is not None:
 @dataclass(frozen=True)
 class Settings:
     project_name: str = "Follow-Up Radar MCP"
-    version: str = "0.5.0"
+    version: str = "0.6.0"
     app_env: str = os.getenv("APP_ENV", "local")
     log_level: str = os.getenv("LOG_LEVEL", "INFO")
     fixture_mode: bool = os.getenv("FIXTURE_MODE", "true").lower() == "true"
