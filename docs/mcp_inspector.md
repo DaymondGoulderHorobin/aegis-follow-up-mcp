@@ -1,6 +1,6 @@
 # MCP Inspector
 
-Sprint 2 uses FastMCP `streamable-http` transport at `/mcp`. A plain browser `GET /mcp` can return `406` because MCP clients must send protocol-specific headers and JSON-RPC payloads. Use MCP Inspector or the smoke script instead.
+Follow-Up Radar uses FastMCP `streamable-http` transport at `/mcp`. A plain browser `GET /mcp` can return `406` because MCP clients must send protocol-specific headers and JSON-RPC payloads. Use MCP Inspector or the smoke script instead.
 
 ## Local Server
 
@@ -48,6 +48,26 @@ In Inspector:
 
 Expected result: the first patient has unresolved A1c and LDL findings, while potassium is suppressed because the synthetic bundle includes follow-up evidence.
 
+## Initialize Capabilities
+
+Sprint 4 advertises Prompt Opinion FHIR-context support during initialize:
+
+```text
+capabilities.extensions.ai.promptopinion/fhir-context
+```
+
+Expected scopes:
+
+- `patient/Patient.rs`
+- `patient/Observation.rs`
+- `patient/Condition.rs`
+- `patient/MedicationStatement.rs`
+- `patient/Encounter.rs`
+
+All scopes should be optional. `offline_access` should not appear.
+
+If MCP Inspector does not expose the raw initialize response, use the scripted smoke check below. The smoke script validates the extension payload before listing tools.
+
 ## Header Context Check
 
 When the client supports custom HTTP headers, send:
@@ -68,4 +88,4 @@ With the server running:
 python scripts/smoke_mcp.py --url http://127.0.0.1:8000/mcp/
 ```
 
-The script initializes the MCP client, lists tools, and calls two tools against synthetic fixture mode.
+The script initializes the MCP client, validates the Prompt Opinion FHIR-context extension payload, lists tools, and calls two tools against synthetic fixture mode.

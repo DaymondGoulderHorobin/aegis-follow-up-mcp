@@ -22,6 +22,7 @@ def test_complete_fhir_context_disables_fixture_mode() -> None:
     assert context.has_external_context is True
     assert context.patient_id == "patient-123"
     assert "secret-token" not in repr(context)
+    assert "secret-token" not in str(context.safe_summary())
     assert context.safe_summary()["access_token"] == "[REDACTED]"
 
 

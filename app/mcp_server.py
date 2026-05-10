@@ -12,6 +12,10 @@ except ImportError:  # pragma: no cover - normal in lightweight local test envs
 
 from app.config import settings
 from app.fhir.context import resolve_patient_id
+from app.prompt_opinion.fhir_context_extension import (
+    build_capabilities_extensions,
+    install_fhir_context_extension,
+)
 from app.services.abnormal_results import find_unresolved_abnormal_results as find_results
 from app.services.brief_generator import generate_follow_up_brief as build_brief
 from app.services.note_drafter import draft_clinician_note as build_note
@@ -25,6 +29,7 @@ class LocalMCPRegistry:
     def __init__(self, name: str):
         self.name = name
         self.tools: dict[str, Callable[..., Any]] = {}
+        self.capabilities_extensions = build_capabilities_extensions()
 
     def tool(self) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
         def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
@@ -37,7 +42,9 @@ class LocalMCPRegistry:
 def _create_mcp() -> Any:
     if FastMCP is None:
         return LocalMCPRegistry(settings.project_name)
-    return FastMCP(settings.project_name)
+    fastmcp_server = FastMCP(settings.project_name, version=settings.version)
+    install_fhir_context_extension(fastmcp_server)
+    return fastmcp_server
 
 
 mcp = _create_mcp()
@@ -91,6 +98,10 @@ def draft_clinician_note(patient_id: str | None = None) -> dict[str, str]:
 
 def get_registered_tool_names() -> list[str]:
     return list(_REGISTERED_TOOL_NAMES)
+
+
+def get_capabilities_extensions() -> dict[str, Any]:
+    return build_capabilities_extensions()
 
 
 def get_mcp_asgi_app() -> Any | None:

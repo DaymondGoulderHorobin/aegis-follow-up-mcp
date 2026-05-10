@@ -1,6 +1,6 @@
-# Sprint 3 Deployment
+# Deployment
 
-Recommended Sprint 3 target: Render Web Service using the Dockerfile and `render.yaml`.
+Recommended target: Render Web Service using the Dockerfile and `render.yaml`.
 
 Clinical decision support only. For clinician review. Not a diagnosis or treatment directive.
 
@@ -33,7 +33,7 @@ MCP_STATELESS_HTTP=false
 ALLOWED_ORIGINS=
 ```
 
-Keep `FIXTURE_MODE=true` for the Sprint 3 demo. Do not configure real FHIR credentials in the deployment.
+Keep `FIXTURE_MODE=true` for the demo. Do not configure real FHIR credentials in the deployment.
 
 ## Render Blueprint Setup
 
@@ -79,7 +79,23 @@ MCP:
 python scripts/smoke_mcp.py --url https://follow-up-radar-mcp.onrender.com/mcp/
 ```
 
+For Sprint 4, the smoke script also validates that MCP initialize capabilities include `ai.promptopinion/fhir-context` with optional scopes and no `offline_access`.
+
 If `GET /mcp` returns `406`, that does not by itself mean the MCP endpoint is broken. Use an MCP client, MCP Inspector, or the smoke script.
+
+## Prompt Opinion FHIR Context
+
+The deployed demo advertises Prompt Opinion FHIR-context compatibility, but it does not require real FHIR secrets. Users can leave the trust toggle disabled and still run the synthetic fixture workflow.
+
+If Prompt Opinion sends context after a user grants optional scopes, the app accepts:
+
+```text
+X-FHIR-Server-URL
+X-FHIR-Access-Token
+X-Patient-ID
+```
+
+Tokens are not logged or returned. Sprint 4 does not request `offline_access`, does not receive refresh tokens, and does not call an external FHIR server.
 
 ## Docker
 

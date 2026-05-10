@@ -6,7 +6,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
-from app.mcp_server import get_mcp_asgi_app, get_registered_tool_names
+from app.mcp_server import (
+    get_capabilities_extensions,
+    get_mcp_asgi_app,
+    get_registered_tool_names,
+)
 
 
 def create_app() -> FastAPI:
@@ -58,6 +62,7 @@ def create_app() -> FastAPI:
             return {
                 "project": settings.project_name,
                 "transport": "fastmcp-unavailable-local-metadata",
+                "capabilities": {"extensions": get_capabilities_extensions()},
                 "tools": get_registered_tool_names(),
             }
 
