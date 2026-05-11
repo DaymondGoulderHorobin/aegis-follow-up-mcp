@@ -5,7 +5,7 @@ Use the deployed `/mcp/` endpoint as the remote MCP server for Aegis Follow-Up.
 ## Server URL
 
 ```text
-https://follow-up-radar-mcp.onrender.com/mcp/
+https://aegis-follow-up-mcp.onrender.com/mcp/
 ```
 
 The final URL should be replaced with the actual Render service URL if Render assigns a different subdomain. Use the trailing slash if the client asks for an exact URL.
@@ -15,7 +15,7 @@ The final URL should be replaced with the actual Render service URL if Render as
 1. Verify `/healthz`, `/readyz`, and `/version` in a browser.
 2. Run:
    ```bash
-   python scripts/smoke_mcp.py --url https://follow-up-radar-mcp.onrender.com/mcp/
+   python scripts/smoke_mcp.py --url https://aegis-follow-up-mcp.onrender.com/mcp/
    ```
 3. Open Prompt Opinion and add the MCP server URL.
 4. Continue through initialization so Prompt Opinion can inspect capabilities.

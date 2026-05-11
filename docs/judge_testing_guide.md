@@ -5,7 +5,7 @@
 Use the deployed MCP endpoint:
 
 ```text
-https://follow-up-radar-mcp.onrender.com/mcp/
+https://aegis-follow-up-mcp.onrender.com/mcp/
 ```
 
 Recommended sequence:
@@ -50,11 +50,11 @@ The same patient also demonstrates suppression evidence for potassium.
 Fallback mode:
 
 ```bash
-python scripts/smoke_mcp.py --url https://follow-up-radar-mcp.onrender.com/mcp/ --attempts 3 --delay-seconds 2 --timeout 30
+python scripts/smoke_mcp.py --url https://aegis-follow-up-mcp.onrender.com/mcp/ --attempts 3 --delay-seconds 2 --timeout 30
 ```
 
 Real Gemini mode, only after Render environment variables are configured:
 
 ```bash
-python scripts/smoke_mcp.py --url https://follow-up-radar-mcp.onrender.com/mcp/ --expect-real-llm
+python scripts/smoke_mcp.py --url https://aegis-follow-up-mcp.onrender.com/mcp/ --expect-real-llm
 ```

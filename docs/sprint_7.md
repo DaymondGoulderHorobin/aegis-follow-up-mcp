@@ -56,13 +56,13 @@ python scripts/smoke_mcp.py --url http://127.0.0.1:8000/mcp/ --attempts 2 --dela
 After merge and Render redeploy:
 
 ```bash
-python scripts/smoke_mcp.py --url https://follow-up-radar-mcp.onrender.com/mcp/ --attempts 3 --delay-seconds 2 --timeout 30
+python scripts/smoke_mcp.py --url https://aegis-follow-up-mcp.onrender.com/mcp/ --attempts 3 --delay-seconds 2 --timeout 30
 ```
 
 If Gemini mode is configured on Render:
 
 ```bash
-python scripts/smoke_mcp.py --url https://follow-up-radar-mcp.onrender.com/mcp/ --expect-real-llm
+python scripts/smoke_mcp.py --url https://aegis-follow-up-mcp.onrender.com/mcp/ --expect-real-llm
 ```
 
 ## Safety Boundaries

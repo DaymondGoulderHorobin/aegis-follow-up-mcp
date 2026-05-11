@@ -2,7 +2,7 @@
 
 ## Objective
 
-Add a product workflow layer that makes Follow-Up Radar feel like an integration-ready clinical operations component while staying deterministic, synthetic-data only, and clinician-review focused.
+Add a product workflow layer that makes Aegis Follow-Up feel like an integration-ready clinical operations component while staying deterministic, synthetic-data only, and clinician-review focused.
 
 Clinical decision support only. For clinician review. Not a diagnosis or treatment directive.
 
@@ -46,7 +46,7 @@ python scripts/smoke_mcp.py --url http://127.0.0.1:8000/mcp/ --attempts 2 --dela
 After merge and Render redeploy:
 
 ```bash
-python scripts/smoke_mcp.py --url https://follow-up-radar-mcp.onrender.com/mcp/ --attempts 3 --delay-seconds 2 --timeout 30
+python scripts/smoke_mcp.py --url https://aegis-follow-up-mcp.onrender.com/mcp/ --attempts 3 --delay-seconds 2 --timeout 30
 ```
 
 Then refresh Prompt Opinion MCP tool discovery and confirm the Sprint 6 tools appear.

@@ -2,7 +2,7 @@
 
 ## Objective
 
-Deploy Follow-Up Radar MCP to a public HTTPS endpoint and validate that MCP Inspector and Prompt Opinion can initialize the server, discover tools, and invoke deterministic synthetic outputs.
+Deploy Aegis Follow-Up MCP to a public HTTPS endpoint and validate that MCP Inspector and Prompt Opinion can initialize the server, discover tools, and invoke deterministic synthetic outputs.
 
 ## Branch
 
@@ -24,7 +24,7 @@ The repository includes:
 Expected deployed base URL:
 
 ```text
-https://follow-up-radar-mcp.onrender.com
+https://aegis-follow-up-mcp.onrender.com
 ```
 
 If Render assigns a different subdomain, use the actual Render URL in every check below.
@@ -32,10 +32,10 @@ If Render assigns a different subdomain, use the actual Render URL in every chec
 ## Public Endpoint Checks
 
 ```bash
-curl https://follow-up-radar-mcp.onrender.com/healthz
-curl https://follow-up-radar-mcp.onrender.com/readyz
-curl https://follow-up-radar-mcp.onrender.com/version
-python scripts/smoke_mcp.py --url https://follow-up-radar-mcp.onrender.com/mcp/
+curl https://aegis-follow-up-mcp.onrender.com/healthz
+curl https://aegis-follow-up-mcp.onrender.com/readyz
+curl https://aegis-follow-up-mcp.onrender.com/version
+python scripts/smoke_mcp.py --url https://aegis-follow-up-mcp.onrender.com/mcp/
 ```
 
 Expected smoke result:
@@ -49,7 +49,7 @@ Expected smoke result:
 
 1. Start MCP Inspector.
 2. Select streamable HTTP transport.
-3. Use `https://follow-up-radar-mcp.onrender.com/mcp/`.
+3. Use `https://aegis-follow-up-mcp.onrender.com/mcp/`.
 4. Initialize.
 5. List tools.
 6. Call `get_patient_snapshot`.

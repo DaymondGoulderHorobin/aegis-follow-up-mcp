@@ -24,7 +24,7 @@ judgement.
 ## Endpoint
 
 ```text
-https://follow-up-radar-mcp.onrender.com/mcp/
+https://aegis-follow-up-mcp.onrender.com/mcp/
 ```
 
 ## Transport

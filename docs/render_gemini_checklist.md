@@ -7,12 +7,12 @@ Use this checklist after Sprint 9 is merged to `main`.
 1. Confirm Render redeployed from latest `main`.
 2. Open:
    ```text
-   https://follow-up-radar-mcp.onrender.com/version
+   https://aegis-follow-up-mcp.onrender.com/version
    ```
 3. Confirm version `0.9.0`.
 4. Run fallback smoke:
    ```bash
-   python scripts/smoke_mcp.py --url https://follow-up-radar-mcp.onrender.com/mcp/ --attempts 3 --delay-seconds 2 --timeout 30
+   python scripts/smoke_mcp.py --url https://aegis-follow-up-mcp.onrender.com/mcp/ --attempts 3 --delay-seconds 2 --timeout 30
    ```
 5. Confirm Prompt Opinion tool discovery shows the final 14 tools.
 
@@ -35,7 +35,7 @@ Only configure Gemini after fallback smoke passes.
 Run:
 
 ```bash
-python scripts/smoke_mcp.py --url https://follow-up-radar-mcp.onrender.com/mcp/ --expect-real-llm
+python scripts/smoke_mcp.py --url https://aegis-follow-up-mcp.onrender.com/mcp/ --expect-real-llm
 ```
 
 Then call `generate_ai_follow_up_brief` for `synthetic-patient-003` and confirm:

@@ -8,14 +8,14 @@ payloads.
 
 Clinical decision support only. For clinician review. Not a diagnosis or treatment directive.
 
-The repository and Python package remain `follow-up-radar-mcp` for deployment
-stability. The marketplace-facing product name is **Aegis Follow-Up**.
+The GitHub repository and Render service are now `aegis-follow-up-mcp`. The Python
+package name remains `follow-up-radar-mcp` for import and installation stability.
 
 ## Hackathon Positioning
 
 - Project: Agents Assemble Prompt Opinion Hackathon
 - Marketplace brand: `Aegis Follow-Up`
-- Stable deployed MCP endpoint: `https://follow-up-radar-mcp.onrender.com/mcp/`
+- Stable deployed MCP endpoint: `https://aegis-follow-up-mcp.onrender.com/mcp/`
 - Transport: Streamable HTTP
 - Authentication: none for the synthetic-data hackathon demo
 - Data mode: synthetic FHIR fixtures by default
