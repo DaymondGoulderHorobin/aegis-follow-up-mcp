@@ -2,7 +2,7 @@
 
 ## Objective
 
-Advertise Prompt Opinion FHIR-context support during MCP initialize while keeping Follow-Up Radar deterministic, synthetic-data based, and clinician-review focused.
+Advertise Prompt Opinion FHIR-context support during MCP initialize while keeping Aegis Follow-Up deterministic, synthetic-data based, and clinician-review focused.
 
 Clinical decision support only. For clinician review. Not a diagnosis or treatment directive.
 

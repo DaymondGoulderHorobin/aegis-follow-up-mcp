@@ -1,9 +1,9 @@
 services:
   - type: web
-    name: follow-up-radar-mcp
+    name: aegis-follow-up-mcp
     runtime: docker
     plan: free
-    repo: https://github.com/DaymondGoulderHorobin/follow-up-radar-mcp
+    repo: https://github.com/DaymondGoulderHorobin/aegis-follow-up-mcp
     branch: main
     dockerfilePath: ./Dockerfile
     dockerContext: .

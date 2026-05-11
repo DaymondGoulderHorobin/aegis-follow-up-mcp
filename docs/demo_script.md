@@ -7,7 +7,7 @@ live FHIR reads or EHR writes.
 Target deployed MCP URL:
 
 ```text
-https://follow-up-radar-mcp.onrender.com/mcp/
+https://aegis-follow-up-mcp.onrender.com/mcp/
 ```
 
 ## Five-Step Flow
@@ -83,11 +83,11 @@ Create a follow-up handoff payload for synthetic-patient-003 without sending it 
 Fallback mode:
 
 ```bash
-python scripts/smoke_mcp.py --url https://follow-up-radar-mcp.onrender.com/mcp/ --attempts 3 --delay-seconds 2 --timeout 30
+python scripts/smoke_mcp.py --url https://aegis-follow-up-mcp.onrender.com/mcp/ --attempts 3 --delay-seconds 2 --timeout 30
 ```
 
 Gemini mode, only after Render secrets are configured:
 
 ```bash
-python scripts/smoke_mcp.py --url https://follow-up-radar-mcp.onrender.com/mcp/ --expect-real-llm
+python scripts/smoke_mcp.py --url https://aegis-follow-up-mcp.onrender.com/mcp/ --expect-real-llm
 ```

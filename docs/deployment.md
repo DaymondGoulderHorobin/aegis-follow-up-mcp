@@ -6,18 +6,18 @@ Clinical decision support only. For clinician review. Not a diagnosis or treatme
 
 Current deployment status: public Render URL is provisioned for testing.
 
-Aegis Follow-Up keeps the existing Render service URL for stability.
+Aegis Follow-Up uses the renamed Render service and public endpoint.
 
 Expected deployed base URL:
 
 ```text
-https://follow-up-radar-mcp.onrender.com
+https://aegis-follow-up-mcp.onrender.com
 ```
 
 Expected MCP URL:
 
 ```text
-https://follow-up-radar-mcp.onrender.com/mcp/
+https://aegis-follow-up-mcp.onrender.com/mcp/
 ```
 
 ## Required Environment
@@ -45,7 +45,7 @@ Leave `GEMINI_API_KEY` unset unless deliberately testing real LLM narrative mode
 
 ## Render Blueprint Setup
 
-1. In Render, create a new Blueprint from `DaymondGoulderHorobin/follow-up-radar-mcp`.
+1. In Render, create a new Blueprint from `DaymondGoulderHorobin/aegis-follow-up-mcp`.
 2. Select `render.yaml` from the repository root.
 3. Confirm the service uses Docker runtime.
 4. Confirm `healthCheckPath` is `/healthz`.
@@ -95,21 +95,21 @@ For the final Sprint 9 validation sequence, use `docs/render_gemini_checklist.md
 Health:
 
 ```bash
-curl https://follow-up-radar-mcp.onrender.com/healthz
-curl https://follow-up-radar-mcp.onrender.com/readyz
-curl https://follow-up-radar-mcp.onrender.com/version
+curl https://aegis-follow-up-mcp.onrender.com/healthz
+curl https://aegis-follow-up-mcp.onrender.com/readyz
+curl https://aegis-follow-up-mcp.onrender.com/version
 ```
 
 MCP:
 
 ```bash
-python scripts/smoke_mcp.py --url https://follow-up-radar-mcp.onrender.com/mcp/
+python scripts/smoke_mcp.py --url https://aegis-follow-up-mcp.onrender.com/mcp/
 ```
 
 Real LLM mode:
 
 ```bash
-python scripts/smoke_mcp.py --url https://follow-up-radar-mcp.onrender.com/mcp/ --expect-real-llm
+python scripts/smoke_mcp.py --url https://aegis-follow-up-mcp.onrender.com/mcp/ --expect-real-llm
 ```
 
 For Sprint 4, the smoke script also validates that MCP initialize capabilities include `ai.promptopinion/fhir-context` with optional scopes and no `offline_access`.
@@ -143,8 +143,8 @@ receive refresh tokens, and does not call an external FHIR server in demo mode.
 Local build:
 
 ```bash
-docker build -t follow-up-radar-mcp .
-docker run --rm -p 8000:8000 follow-up-radar-mcp
+docker build -t aegis-follow-up-mcp .
+docker run --rm -p 8000:8000 aegis-follow-up-mcp
 ```
 
-CI runs `docker build -t follow-up-radar-mcp .` on pull requests.
+CI runs `docker build -t aegis-follow-up-mcp .` on pull requests.
