@@ -19,7 +19,7 @@ package name remains `follow-up-radar-mcp` for import and installation stability
 - Transport: Streamable HTTP
 - Authentication: none for the synthetic-data hackathon demo
 - Data mode: synthetic FHIR fixtures by default
-- Current version: `0.9.0`
+- Current version: `0.10.0`
 
 ## Local Setup
 
@@ -60,7 +60,7 @@ python scripts/smoke_mcp.py --url http://127.0.0.1:8000/mcp/
 
 ## MCP Tools
 
-Aegis Follow-Up exposes 14 MCP tools:
+Aegis Follow-Up exposes 15 MCP tools:
 
 - `get_patient_snapshot`
 - `get_recent_observations`
@@ -73,6 +73,7 @@ Aegis Follow-Up exposes 14 MCP tools:
 - `explain_result_decisions`
 - `list_follow_up_tasks`
 - `get_fhir_connection_status`
+- `validate_fhir_context_connection`
 - `create_follow_up_handoff_payload`
 - `update_follow_up_task_status`
 - `get_ehr_integration_summary`
@@ -117,8 +118,11 @@ Requested SMART scopes are optional by default:
 - `patient/Encounter.rs`
 
 The demo does not request `offline_access`, does not handle refresh tokens, and
-does not perform live FHIR reads. `get_fhir_connection_status` reports whether FHIR
-headers are present and whether the active source is `synthetic_fixture_data`.
+does not depend on live FHIR reads. `get_fhir_connection_status` reports whether
+FHIR headers are present and whether the active source is `synthetic_fixture_data`.
+`validate_fhir_context_connection` can optionally prove read-only reachability to
+`GET /Patient/{patient_id}` when FHIR context is supplied and
+`LIVE_FHIR_READS_ENABLED=true`.
 
 ## Safety
 

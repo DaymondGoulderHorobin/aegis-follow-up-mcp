@@ -46,6 +46,7 @@ In Inspector:
    - `explain_result_decisions`
    - `list_follow_up_tasks`
    - `get_fhir_connection_status`
+   - `validate_fhir_context_connection`
    - `create_follow_up_handoff_payload`
    - `update_follow_up_task_status`
    - `get_ehr_integration_summary`
@@ -74,11 +75,12 @@ In Inspector:
    ```json
    {"patient_id": "synthetic-patient-001"}
    ```
-12. Call `create_follow_up_handoff_payload` with:
+12. Optionally call `validate_fhir_context_connection` only when FHIR context headers are supplied and live reads are enabled.
+13. Call `create_follow_up_handoff_payload` with:
    ```json
    {"patient_id": "synthetic-patient-003", "profile_id": "default_primary_care"}
    ```
-13. Call `update_follow_up_task_status` with:
+14. Call `update_follow_up_task_status` with:
    ```json
    {
      "task_id": "task-synthetic-patient-003-obs-potassium-003-2026-04-24",
@@ -119,7 +121,7 @@ X-FHIR-Server-URL: https://example.fhir.test
 X-FHIR-Access-Token: synthetic-token-for-local-testing
 ```
 
-Then call `get_patient_snapshot` without a `patient_id` argument. The tool should select `synthetic-patient-002`. Call `get_fhir_connection_status` to show header presence without returning token values. Token values are parsed in memory only and are not logged or returned.
+Then call `get_patient_snapshot` without a `patient_id` argument. The tool should select `synthetic-patient-002`. Call `get_fhir_connection_status` to show header presence without returning token values. If `LIVE_FHIR_READS_ENABLED=true` and the FHIR server is reachable, call `validate_fhir_context_connection` to prove read-only Patient reachability. Token values are parsed in memory only and are not logged or returned.
 
 ## Scripted Smoke Check
 
@@ -129,4 +131,4 @@ With the server running:
 python scripts/smoke_mcp.py --url http://127.0.0.1:8000/mcp/
 ```
 
-The script initializes the MCP client, validates the Prompt Opinion FHIR-context extension payload, lists tools, and calls the priority, task queue, audit trail, FHIR status, handoff payload, AI brief fallback, EHR summary, and demo workflow tools against synthetic fixture mode.
+The script initializes the MCP client, validates the Prompt Opinion FHIR-context extension payload, lists tools, and calls the priority, task queue, audit trail, FHIR status, optional FHIR proof, handoff payload, AI brief fallback, EHR summary, and demo workflow tools against synthetic fixture mode.

@@ -18,7 +18,7 @@ if load_dotenv is not None:
 @dataclass(frozen=True)
 class Settings:
     project_name: str = "Aegis Follow-Up"
-    version: str = "0.9.0"
+    version: str = "0.10.0"
     app_env: str = os.getenv("APP_ENV", "local")
     log_level: str = os.getenv("LOG_LEVEL", "INFO")
     fixture_mode: bool = os.getenv("FIXTURE_MODE", "true").lower() == "true"

@@ -8,14 +8,13 @@ Use the deployed MCP endpoint:
 https://aegis-follow-up-mcp.onrender.com/mcp/
 ```
 
-Recommended sequence:
+Primary 5-tool happy path:
 
 1. `get_fhir_connection_status`
 2. `list_follow_up_tasks`
 3. `explain_result_decisions` for `synthetic-patient-003`
-4. `assess_follow_up_priority` for `synthetic-patient-003`
-5. `generate_ai_follow_up_brief` for `synthetic-patient-003`
-6. `create_follow_up_handoff_payload` for `synthetic-patient-003`
+4. `generate_ai_follow_up_brief` for `synthetic-patient-003`
+5. `create_follow_up_handoff_payload` for `synthetic-patient-003`
 
 ## Expected Results
 
@@ -26,6 +25,17 @@ Recommended sequence:
 - The AI brief includes structured evidence beside the narrative.
 - In Gemini-enabled final demo mode, `fallback_used` should be `false`.
 - The handoff payload reports `payload_only: true` and `ehr_write_performed: false`.
+
+## Optional FHIR Feasibility Proof
+
+Use `validate_fhir_context_connection` only if Prompt Opinion supplies
+`X-FHIR-Server-URL`, `X-FHIR-Access-Token`, and `X-Patient-ID`, and the Render
+service has `LIVE_FHIR_READS_ENABLED=true`.
+
+The expected result is safe metadata only: reachability status, HTTP status,
+resource type, and boolean token/context fields. The tool does not return tokens,
+patient demographics, a full FHIR payload, or PHI-heavy data. The primary demo does
+not require real PHI or live FHIR reads.
 
 ## Optional Second Case
 
@@ -57,4 +67,11 @@ Real Gemini mode, only after Render environment variables are configured:
 
 ```bash
 python scripts/smoke_mcp.py --url https://aegis-follow-up-mcp.onrender.com/mcp/ --expect-real-llm
+```
+
+Live FHIR feasibility proof, only when a test FHIR server and temporary token are
+configured operationally:
+
+```bash
+python scripts/smoke_mcp.py --url https://aegis-follow-up-mcp.onrender.com/mcp/ --expect-live-fhir --fhir-server-url https://example.fhir.test --fhir-access-token <token> --fhir-patient-id <patient-id>
 ```

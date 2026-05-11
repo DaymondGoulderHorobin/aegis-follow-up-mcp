@@ -22,10 +22,9 @@ https://aegis-follow-up-mcp.onrender.com/mcp/
    Call `list_follow_up_tasks` with `default_primary_care`.
    Show `synthetic-patient-003` in `same_day_clinician_review_consideration`.
 
-3. **Deterministic Audit And Priority**
-   Call `explain_result_decisions` and `assess_follow_up_priority` for
-   `synthetic-patient-003`. Show that potassium was flagged by deterministic rules,
-   not by the LLM.
+3. **Deterministic Audit**
+   Call `explain_result_decisions` for `synthetic-patient-003`. Show that
+   potassium was flagged by deterministic rules, not by the LLM.
 
 4. **Controlled AI Narrative**
    Call `generate_ai_follow_up_brief` for `synthetic-patient-003`. Show:
@@ -48,6 +47,14 @@ https://aegis-follow-up-mcp.onrender.com/mcp/
 Close with: Prompt Opinion chooses tools, Aegis Follow-Up rules decide, Gemini
 synthesizes, safety validates, the audit trail explains, and clinician review
 remains in control.
+
+## Optional FHIR Connectivity Proof
+
+If Prompt Opinion supplies FHIR context headers and Render has
+`LIVE_FHIR_READS_ENABLED=true`, call `validate_fhir_context_connection`.
+Frame this as a reachability proof only. It should show safe metadata such as
+`status`, `http_status`, `resource_type`, `token_disclosed: false`, and
+`payload_includes_phi: false`. Do not use it as the clinical workflow source.
 
 ## Optional Mini-Case
 
@@ -76,6 +83,10 @@ Generate an AI follow-up brief for synthetic-patient-003 and show the determinis
 
 ```text
 Create a follow-up handoff payload for synthetic-patient-003 without sending it anywhere.
+```
+
+```text
+If FHIR context is available, validate the FHIR context connection without returning PHI.
 ```
 
 ## Rehearsal Checks

@@ -40,7 +40,7 @@ LLM_TIMEOUT_SECONDS=20
 LLM_MAX_OUTPUT_TOKENS=700
 ```
 
-Keep `FIXTURE_MODE=true` and `LIVE_FHIR_READS_ENABLED=false` for the demo. Do not configure real FHIR credentials in the deployment.
+Keep `FIXTURE_MODE=true` and `LIVE_FHIR_READS_ENABLED=false` for the primary demo. Do not configure real FHIR credentials in the deployment.
 Leave `GEMINI_API_KEY` unset unless deliberately testing real LLM narrative mode.
 
 ## Render Blueprint Setup
@@ -88,7 +88,7 @@ Fallback mode works without any API key. To test real Gemini synthesis on Render
 The Gemini REST call uses the Google AI `generateContent` API with the key sent in
 the `x-goog-api-key` header.
 
-For the final Sprint 9 validation sequence, use `docs/render_gemini_checklist.md`.
+For the final Sprint 10 validation sequence, use `docs/render_gemini_checklist.md`.
 
 ## Smoke Checks
 
@@ -114,6 +114,10 @@ python scripts/smoke_mcp.py --url https://aegis-follow-up-mcp.onrender.com/mcp/ 
 
 For Sprint 4, the smoke script also validates that MCP initialize capabilities include `ai.promptopinion/fhir-context` with optional scopes and no `offline_access`.
 
+For Sprint 10, the smoke script confirms `validate_fhir_context_connection` is
+registered and returns safe not-attempted metadata in fixture mode. A live FHIR
+proof is optional and requires `--expect-live-fhir` plus temporary FHIR headers.
+
 The smoke script validates the priority tool, workflow layer, dynamic EHR summary
 metrics, FHIR transparency, payload-only handoff, and AI brief fallback mode:
 critical synthetic potassium triage, task queue, audit trail, simulated review state
@@ -135,8 +139,10 @@ X-Patient-ID
 ```
 
 Tokens are not logged or returned. `get_fhir_connection_status` reports token
-presence only as a boolean. The app does not request `offline_access`, does not
-receive refresh tokens, and does not call an external FHIR server in demo mode.
+presence only as a boolean. The app does not request `offline_access` and does not
+receive refresh tokens. `validate_fhir_context_connection` may call
+`GET /Patient/{patient_id}` only when live reads are explicitly enabled and FHIR
+context is supplied; it returns safe metadata only.
 
 ## Docker
 

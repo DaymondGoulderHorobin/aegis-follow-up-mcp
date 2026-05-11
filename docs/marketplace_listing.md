@@ -44,8 +44,10 @@ fixture workflow.
 ## Production Note
 
 The demo uses synthetic fixture data by default. It does not require PHI, does not
-perform real EHR writes, and does not perform live FHIR reads unless a future
-production mode is explicitly implemented and validated.
+perform real EHR writes, and does not depend on live FHIR reads. A narrow optional
+connectivity proof can perform a read-only `GET /Patient/{patient_id}` only when
+FHIR context is supplied and `LIVE_FHIR_READS_ENABLED=true`; it returns safe
+metadata only, never tokens or full FHIR payloads.
 
 ## Recommended Demo Prompts
 
@@ -95,4 +97,6 @@ workflows after human review.
 
 The system is deployed as a Docker-backed Render service with health checks, smoke
 tests, deterministic fallback mode, Prompt Opinion FHIR-context compatibility, and
-optional Gemini narrative mode controlled by environment variables.
+optional Gemini narrative mode controlled by environment variables. Sprint 10 adds
+an optional mocked-and-tested FHIR reachability proof while preserving the
+synthetic primary demo path.

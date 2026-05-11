@@ -19,8 +19,9 @@ and generate guarded AI summaries for clinician review.
 Aegis Follow-Up is a Prompt Opinion-ready MCP server. It exposes tools for
 synthetic patient snapshots, observation review, abnormal-result detection,
 deterministic follow-up briefs, rule-profile priority assessment, audit trail
-explanations, task queue workflow state, FHIR connection transparency, payload-only
-agent handoff, EHR integration positioning, and controlled AI narrative synthesis.
+explanations, task queue workflow state, FHIR connection transparency, optional
+read-only FHIR reachability proof, payload-only agent handoff, EHR integration
+positioning, and controlled AI narrative synthesis.
 
 ## AI Factor
 
@@ -42,22 +43,24 @@ care-coordination agents could consume after human review.
 
 The demo is deployable today as a Docker-backed Render service with health checks,
 smoke tests, Prompt Opinion FHIR-context capability advertising, fixture-mode
-fallback, optional Gemini narrative mode, and no required secrets for the default
-demo. The path to production is clear: HIPAA-eligible hosting, BAA coverage,
-persistent audit storage, tenant-aware access controls, monitoring, security review,
-and explicitly reviewed EHR write workflows.
+fallback, optional Gemini narrative mode, optional FHIR connectivity proof, and no
+required secrets for the default demo. The path to production is clear:
+HIPAA-eligible hosting, BAA coverage, persistent audit storage, tenant-aware access
+controls, monitoring, security review, and explicitly reviewed EHR write workflows.
 
 ## Safety
 
 The hackathon demo uses synthetic fixture data only. It does not contain PHI, does
 not request `offline_access`, does not handle refresh tokens, does not perform real
 FHIR reads by default, does not write to an EHR, does not contact another agent, and
-does not diagnose, prescribe, or issue treatment directives.
+does not diagnose, prescribe, or issue treatment directives. The optional
+connectivity proof returns safe metadata only and never returns tokens or full FHIR
+payloads.
 
 ## Demo Flow
 
 1. Show `get_fhir_connection_status` and confirm synthetic fixture mode.
 2. Show `list_follow_up_tasks` and the high-priority potassium case.
-3. Show `explain_result_decisions` and `assess_follow_up_priority`.
+3. Show `explain_result_decisions` and the deterministic audit trail.
 4. Show `generate_ai_follow_up_brief` with structured evidence beside the narrative.
 5. Show `create_follow_up_handoff_payload` with payload-only safety flags.
