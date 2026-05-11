@@ -15,6 +15,7 @@ EXPECTED_TOOLS = {
     "explain_result_decisions",
     "list_follow_up_tasks",
     "get_fhir_connection_status",
+    "validate_fhir_context_connection",
     "create_follow_up_handoff_payload",
     "update_follow_up_task_status",
     "get_ehr_integration_summary",
@@ -43,7 +44,7 @@ def test_version() -> None:
 
     assert response.status_code == 200
     assert response.json()["project"] == "Aegis Follow-Up"
-    assert response.json()["version"] == "0.9.0"
+    assert response.json()["version"] == "0.10.0"
     assert response.json()["mcp_transport"] == "streamable-http"
 
 
@@ -53,5 +54,6 @@ def test_mcp_endpoint_is_available_and_tools_are_registered() -> None:
 
     assert response.status_code < 500
     assert set(get_registered_tool_names()) == EXPECTED_TOOLS
+    assert len(get_registered_tool_names()) == 15
     if response.status_code == 200 and response.headers.get("content-type") == "application/json":
         assert set(response.json()["tools"]) == EXPECTED_TOOLS

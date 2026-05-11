@@ -1,6 +1,6 @@
 # Render And Gemini Final Checklist
 
-Use this checklist after Sprint 9 is merged to `main`.
+Use this checklist after Sprint 10 is merged to `main`.
 
 ## Fallback Validation
 
@@ -9,12 +9,31 @@ Use this checklist after Sprint 9 is merged to `main`.
    ```text
    https://aegis-follow-up-mcp.onrender.com/version
    ```
-3. Confirm version `0.9.0`.
+3. Confirm version `0.10.0`.
 4. Run fallback smoke:
    ```bash
    python scripts/smoke_mcp.py --url https://aegis-follow-up-mcp.onrender.com/mcp/ --attempts 3 --delay-seconds 2 --timeout 30
    ```
-5. Confirm Prompt Opinion tool discovery shows the final 14 tools.
+5. Confirm Prompt Opinion tool discovery shows the final 15 tools.
+
+## Optional FHIR Connectivity Proof
+
+Leave `LIVE_FHIR_READS_ENABLED=false` for fallback validation. To prove FHIR
+reachability with a non-production test server only, temporarily set:
+
+```text
+LIVE_FHIR_READS_ENABLED=true
+```
+
+Then supply Prompt Opinion/FastMCP headers for `X-FHIR-Server-URL`,
+`X-FHIR-Access-Token`, and `X-Patient-ID`, and run:
+
+```bash
+python scripts/smoke_mcp.py --url https://aegis-follow-up-mcp.onrender.com/mcp/ --expect-live-fhir --fhir-server-url https://example.fhir.test --fhir-access-token <token> --fhir-patient-id <patient-id>
+```
+
+Turn `LIVE_FHIR_READS_ENABLED=false` again after the proof unless actively
+testing FHIR connectivity. Do not commit or screenshot tokens.
 
 ## Gemini Configuration
 

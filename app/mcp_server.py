@@ -24,6 +24,9 @@ from app.services.ehr_integration import get_ehr_integration_summary as build_eh
 from app.services.fhir_connection_status import (
     get_fhir_connection_status as build_fhir_status,
 )
+from app.services.fhir_connectivity import (
+    validate_fhir_context_connection as build_fhir_connectivity_proof,
+)
 from app.services.follow_up_priority import assess_follow_up_priority as build_priority
 from app.services.follow_up_tasks import list_follow_up_tasks as build_task_queue
 from app.services.handoff_payload import create_follow_up_handoff_payload as build_handoff
@@ -162,9 +165,16 @@ def list_follow_up_tasks(
 
 @_register_tool
 def get_fhir_connection_status(patient_id: str | None = None) -> dict[str, Any]:
-    """Report fixture-versus-FHIR context status without live reads."""
+    """Report fixture-versus-FHIR context status without live clinical reads."""
 
     return build_fhir_status(patient_id=patient_id)
+
+
+@_register_tool
+def validate_fhir_context_connection() -> dict[str, Any]:
+    """Optionally prove FHIR Patient reachability with safe metadata only."""
+
+    return build_fhir_connectivity_proof()
 
 
 @_register_tool

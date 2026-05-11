@@ -9,6 +9,7 @@ from collections.abc import Awaitable, Callable
 from typing import Any
 
 from fastmcp import Client
+from fastmcp.client.transports import StreamableHttpTransport
 
 from app.prompt_opinion.fhir_context_extension import (
     DEFAULT_FHIR_CONTEXT_SCOPES,
@@ -27,6 +28,7 @@ EXPECTED_TOOLS = {
     "explain_result_decisions",
     "list_follow_up_tasks",
     "get_fhir_connection_status",
+    "validate_fhir_context_connection",
     "create_follow_up_handoff_payload",
     "update_follow_up_task_status",
     "get_ehr_integration_summary",
@@ -47,6 +49,12 @@ def _content_to_text(result: Any) -> str:
     if not content:
         return str(result)
     return "\n".join(str(getattr(item, "text", item)) for item in content)
+
+
+def _transport_for_url(url: str, headers: dict[str, str]) -> str | StreamableHttpTransport:
+    if not headers:
+        return url
+    return StreamableHttpTransport(url=url, headers=headers)
 
 
 async def _with_retries(
@@ -114,8 +122,15 @@ def _validate_prompt_opinion_extension(initialize_result: Any) -> dict[str, Any]
     }
 
 
-async def smoke_once(url: str, timeout: float, expect_real_llm: bool) -> dict[str, Any]:
-    async with Client(url, timeout=timeout, init_timeout=timeout) as client:
+async def smoke_once(
+    url: str,
+    timeout: float,
+    expect_real_llm: bool,
+    expect_live_fhir: bool,
+    fhir_headers: dict[str, str],
+) -> dict[str, Any]:
+    transport = _transport_for_url(url, fhir_headers)
+    async with Client(transport, timeout=timeout, init_timeout=timeout) as client:
         initialize_result = client.initialize_result or await client.initialize()
         extension_summary = _validate_prompt_opinion_extension(initialize_result)
         tools = await client.list_tools()
@@ -153,6 +168,7 @@ async def smoke_once(url: str, timeout: float, expect_real_llm: bool) -> dict[st
             "get_fhir_connection_status",
             {"patient_id": "synthetic-patient-001"},
         )
+        fhir_connectivity = await client.call_tool("validate_fhir_context_connection", {})
         handoff = await client.call_tool(
             "create_follow_up_handoff_payload",
             {"patient_id": "synthetic-patient-003"},
@@ -170,6 +186,7 @@ async def smoke_once(url: str, timeout: float, expect_real_llm: bool) -> dict[st
     audit_text = _content_to_text(audit)
     workflow_text = _content_to_text(workflow_update)
     fhir_status_text = _content_to_text(fhir_status)
+    fhir_connectivity_text = _content_to_text(fhir_connectivity)
     handoff_text = _content_to_text(handoff)
     ai_brief_text = _content_to_text(ai_brief)
     ehr_summary_text = _content_to_text(ehr_summary)
@@ -193,6 +210,15 @@ async def smoke_once(url: str, timeout: float, expect_real_llm: bool) -> dict[st
     _require_text(workflow_text, "ehr_write_performed", "workflow update")
     _require_text(fhir_status_text, "synthetic_fixture_data", "FHIR connection status")
     _require_text(fhir_status_text, "live_fhir_reads_enabled", "FHIR connection status")
+    _require_text(fhir_connectivity_text, "token_disclosed", "FHIR connectivity proof")
+    _require_text(fhir_connectivity_text, "payload_includes_phi", "FHIR connectivity proof")
+    if expect_live_fhir:
+        _require_text(fhir_connectivity_text, "reachable", "FHIR connectivity proof")
+    else:
+        _require_text(fhir_connectivity_text, "not_attempted", "FHIR connectivity proof")
+    access_token = fhir_headers.get("X-FHIR-Access-Token")
+    if access_token and access_token in fhir_connectivity_text:
+        raise SystemExit("FHIR connectivity proof disclosed the access token.")
     _require_text(handoff_text, "handoff_payload_created", "handoff payload")
     _require_text(handoff_text, "payload_only", "handoff payload")
     _require_text(handoff_text, "ehr_write_performed", "handoff payload")
@@ -227,6 +253,7 @@ async def smoke_once(url: str, timeout: float, expect_real_llm: bool) -> dict[st
             "explain_result_decisions",
             "update_follow_up_task_status",
             "get_fhir_connection_status",
+            "validate_fhir_context_connection",
             "create_follow_up_handoff_payload",
             "generate_ai_follow_up_brief",
             "get_ehr_integration_summary",
@@ -240,13 +267,21 @@ async def smoke(
     delay_seconds: float,
     timeout: float,
     expect_real_llm: bool,
+    expect_live_fhir: bool,
+    fhir_headers: dict[str, str],
 ) -> None:
     normalized_url = _normalize_mcp_url(url)
     result: dict[str, Any] = {}
 
     async def run_once() -> None:
         nonlocal result
-        result = await smoke_once(normalized_url, timeout, expect_real_llm)
+        result = await smoke_once(
+            normalized_url,
+            timeout,
+            expect_real_llm,
+            expect_live_fhir,
+            fhir_headers,
+        )
 
     await _with_retries(run_once, attempts, delay_seconds)
     print("MCP smoke check passed.")
@@ -264,7 +299,35 @@ def main() -> None:
         action="store_true",
         help="Require the AI brief to use a configured real LLM instead of fallback mode.",
     )
+    parser.add_argument(
+        "--expect-live-fhir",
+        action="store_true",
+        help="Require validate_fhir_context_connection to reach a live FHIR Patient endpoint.",
+    )
+    parser.add_argument("--fhir-server-url")
+    parser.add_argument("--fhir-access-token")
+    parser.add_argument("--fhir-patient-id")
     args = parser.parse_args()
+    fhir_headers: dict[str, str] = {}
+    if args.expect_live_fhir:
+        missing = [
+            name
+            for name, value in {
+                "--fhir-server-url": args.fhir_server_url,
+                "--fhir-access-token": args.fhir_access_token,
+                "--fhir-patient-id": args.fhir_patient_id,
+            }.items()
+            if not value
+        ]
+        if missing:
+            raise SystemExit(
+                "--expect-live-fhir requires " + ", ".join(missing) + "."
+            )
+        fhir_headers = {
+            "X-FHIR-Server-URL": args.fhir_server_url,
+            "X-FHIR-Access-Token": args.fhir_access_token,
+            "X-Patient-ID": args.fhir_patient_id,
+        }
     asyncio.run(
         smoke(
             args.url,
@@ -272,6 +335,8 @@ def main() -> None:
             args.delay_seconds,
             args.timeout,
             args.expect_real_llm,
+            args.expect_live_fhir,
+            fhir_headers,
         )
     )
 
