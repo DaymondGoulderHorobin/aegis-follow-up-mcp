@@ -42,8 +42,8 @@ def test_version() -> None:
         response = client.get("/version")
 
     assert response.status_code == 200
-    assert response.json()["project"] == "Follow-Up Radar MCP"
-    assert response.json()["version"] == "0.8.0"
+    assert response.json()["project"] == "Aegis Follow-Up"
+    assert response.json()["version"] == "0.9.0"
     assert response.json()["mcp_transport"] == "streamable-http"
 
 

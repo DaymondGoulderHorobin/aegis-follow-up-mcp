@@ -1,8 +1,8 @@
-# Final Demo Script
+# Aegis Follow-Up Final Demo Script
 
-Goal: show Prompt Opinion or MCP Inspector discovering Follow-Up Radar, proving the
-deterministic audit trail first, then showing controlled AI narrative synthesis from
-the same structured evidence and a payload-only agent handoff.
+Goal: show a focused, judge-friendly flow that proves transparency, deterministic
+clinical logic, controlled AI synthesis, and handoff readiness without claiming
+live FHIR reads or EHR writes.
 
 Target deployed MCP URL:
 
@@ -10,62 +10,84 @@ Target deployed MCP URL:
 https://follow-up-radar-mcp.onrender.com/mcp/
 ```
 
-## Flow
+## Five-Step Flow
 
-1. Open the deployed `/healthz`, `/readyz`, and `/version` endpoints.
-2. Run or show the deployed smoke check:
-   ```bash
-   python scripts/smoke_mcp.py --url https://follow-up-radar-mcp.onrender.com/mcp/
-   ```
-3. Connect MCP Inspector or Prompt Opinion to `/mcp/`.
-4. Show the registered tools, including `get_fhir_connection_status` and
-   `create_follow_up_handoff_payload`.
-5. Call `get_fhir_connection_status` and show `active_data_source: synthetic_fixture_data`.
-6. Call `list_follow_up_tasks` with the default primary care profile.
-7. Show `synthetic-patient-003` in `same_day_clinician_review_consideration`.
-8. Show `synthetic-patient-001` in `soon_clinician_review_consideration`.
-9. Call `explain_result_decisions` for `synthetic-patient-003`.
-10. Show why potassium was flagged by deterministic rules.
-11. Call `generate_ai_follow_up_brief` for `synthetic-patient-003`.
-12. Show that `structured_findings`, `priority`, and `audit_summary` remain present
-    beside the narrative.
-13. Highlight `safety_validation`, `fallback_used`, and `fallback_reason`. In default
-    Render mode, fallback is expected because no API key is configured.
-14. Call `create_follow_up_handoff_payload` for `synthetic-patient-003`.
-15. Show `payload_only: true`, `required_human_review: true`, and
-    `ehr_write_performed: false`.
-16. Call `update_follow_up_task_status` for the synthetic-patient-003 potassium task with status `reviewed`.
-17. Show `demo_state_only: true` and `ehr_write_performed: false`.
-18. Call `get_ehr_integration_summary`.
-19. Show `workflow_metrics`, including priority counts and demo status counts.
-20. Close with: rules decide, AI synthesizes, audit trail explains, handoff payload integrates, clinician remains in control.
+1. **FHIR Transparency**
+   Call `get_fhir_connection_status` and show:
+   - `active_data_source: synthetic_fixture_data`
+   - `live_fhir_reads_enabled: false`
+   - no PHI required for the demo
 
-## Sample Prompt Opinion Ask
+2. **Clinic Queue**
+   Call `list_follow_up_tasks` with `default_primary_care`.
+   Show `synthetic-patient-003` in `same_day_clinician_review_consideration`.
 
-Check this synthetic patient for unresolved abnormal results and draft a follow-up brief for clinician review.
+3. **Deterministic Audit And Priority**
+   Call `explain_result_decisions` and `assess_follow_up_priority` for
+   `synthetic-patient-003`. Show that potassium was flagged by deterministic rules,
+   not by the LLM.
 
-Assess follow-up priority for synthetic-patient-003 and explain the deterministic rationale without adding clinical recommendations.
+4. **Controlled AI Narrative**
+   Call `generate_ai_follow_up_brief` for `synthetic-patient-003`. Show:
+   - `structured_findings`
+   - `priority`
+   - `audit_summary`
+   - `safety_validation`
+   - `fallback_used`
 
-Assess follow-up priority for synthetic-patient-004.
+   In final Gemini mode, confirm `fallback_used: false`. In fallback mode, explain
+   that the demo still works without an API key.
 
-List the follow-up task queue using the default primary care profile.
+5. **Agent-Ecosystem Handoff**
+   Call `create_follow_up_handoff_payload` for `synthetic-patient-003`. Show:
+   - `payload_only: true`
+   - `required_human_review: true`
+   - `ehr_write_performed: false`
+   - `outbound_action_performed: false`
 
-Explain why synthetic-patient-001 was flagged or suppressed.
+Close with: Prompt Opinion chooses tools, Aegis Follow-Up rules decide, Gemini
+synthesizes, safety validates, the audit trail explains, and clinician review
+remains in control.
 
-Show the FHIR connection status for this demo.
+## Optional Mini-Case
 
-Generate an AI follow-up brief for synthetic-patient-001 and show the deterministic evidence fields.
+If time allows, call `explain_result_decisions` for `synthetic-patient-001` to show
+multiple unresolved findings: Hemoglobin A1c and LDL cholesterol. Also point out
+that potassium was suppressed because the synthetic fixture includes follow-up
+evidence.
 
-Create a follow-up handoff payload for synthetic-patient-003 without sending it anywhere.
+## Demo Prompts
 
-Mark task-synthetic-patient-003-obs-potassium-003-2026-04-24 as reviewed in the demo workflow.
-
-Summarize the EHR integration model for this MCP server.
-
-## Rehearsal Check
-
-```bash
-python scripts/smoke_mcp.py --url http://127.0.0.1:8000/mcp/
+```text
+Show the FHIR connection status for Aegis Follow-Up and explain whether live FHIR reads occurred.
 ```
 
-Replace the URL with the deployed Render URL after the service is provisioned.
+```text
+List the follow-up task queue using the default primary care profile.
+```
+
+```text
+Explain why synthetic-patient-003 is high priority and show the deterministic audit trail.
+```
+
+```text
+Generate an AI follow-up brief for synthetic-patient-003 and show the deterministic evidence fields.
+```
+
+```text
+Create a follow-up handoff payload for synthetic-patient-003 without sending it anywhere.
+```
+
+## Rehearsal Checks
+
+Fallback mode:
+
+```bash
+python scripts/smoke_mcp.py --url https://follow-up-radar-mcp.onrender.com/mcp/ --attempts 3 --delay-seconds 2 --timeout 30
+```
+
+Gemini mode, only after Render secrets are configured:
+
+```bash
+python scripts/smoke_mcp.py --url https://follow-up-radar-mcp.onrender.com/mcp/ --expect-real-llm
+```

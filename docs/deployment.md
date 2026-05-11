@@ -6,6 +6,8 @@ Clinical decision support only. For clinician review. Not a diagnosis or treatme
 
 Current deployment status: public Render URL is provisioned for testing.
 
+Aegis Follow-Up keeps the existing Render service URL for stability.
+
 Expected deployed base URL:
 
 ```text
@@ -67,7 +69,7 @@ Use this if the Blueprint path is not available:
 
 1. Create a new Render Web Service from the GitHub repository.
 2. Choose Docker as the runtime.
-3. Use branch `main` after Sprint 3 merges, or `codex/sprint-3-deployment-validation` for branch validation.
+3. Use branch `main`.
 4. Set the health check path to `/healthz`.
 5. Set the environment variables listed above.
 6. Deploy the service.
@@ -85,6 +87,8 @@ Fallback mode works without any API key. To test real Gemini synthesis on Render
 
 The Gemini REST call uses the Google AI `generateContent` API with the key sent in
 the `x-goog-api-key` header.
+
+For the final Sprint 9 validation sequence, use `docs/render_gemini_checklist.md`.
 
 ## Smoke Checks
 

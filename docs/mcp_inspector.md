@@ -1,6 +1,6 @@
 # MCP Inspector
 
-Follow-Up Radar uses FastMCP `streamable-http` transport at `/mcp`. A plain browser `GET /mcp` can return `406` because MCP clients must send protocol-specific headers and JSON-RPC payloads. Use MCP Inspector or the smoke script instead.
+Aegis Follow-Up uses FastMCP `streamable-http` transport at `/mcp`. A plain browser `GET /mcp` can return `406` because MCP clients must send protocol-specific headers and JSON-RPC payloads. Use MCP Inspector or the smoke script instead.
 
 ## Local Server
 

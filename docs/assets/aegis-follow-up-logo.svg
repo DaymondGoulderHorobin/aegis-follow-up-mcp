@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="320" viewBox="0 0 960 320" role="img" aria-labelledby="title desc">
+  <title id="title">Aegis Follow-Up logo</title>
+  <desc id="desc">Shield mark with follow-up pulse line and Aegis Follow-Up wordmark.</desc>
+  <rect width="960" height="320" rx="28" fill="#f7fafc"/>
+  <g transform="translate(72 40)">
+    <path d="M120 0 224 38v72c0 75-43 116-104 150C59 226 16 185 16 110V38L120 0Z" fill="#0f766e"/>
+    <path d="M120 24 196 52v58c0 56-29 88-76 116-47-28-76-60-76-116V52l76-28Z" fill="#f7fafc"/>
+    <path d="M64 126h33l18-44 25 86 18-42h30" fill="none" stroke="#0f766e" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="120" cy="120" r="102" fill="none" stroke="#14b8a6" stroke-width="6" opacity=".45"/>
+  </g>
+  <g fill="#102a43">
+    <text x="344" y="132" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="58" font-weight="760">Aegis Follow-Up</text>
+    <text x="348" y="184" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="25" font-weight="500" fill="#486581">Auditable follow-up safety layer for clinician review</text>
+  </g>
+</svg>

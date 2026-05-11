@@ -1,0 +1,56 @@
+# Render And Gemini Final Checklist
+
+Use this checklist after Sprint 9 is merged to `main`.
+
+## Fallback Validation
+
+1. Confirm Render redeployed from latest `main`.
+2. Open:
+   ```text
+   https://follow-up-radar-mcp.onrender.com/version
+   ```
+3. Confirm version `0.9.0`.
+4. Run fallback smoke:
+   ```bash
+   python scripts/smoke_mcp.py --url https://follow-up-radar-mcp.onrender.com/mcp/ --attempts 3 --delay-seconds 2 --timeout 30
+   ```
+5. Confirm Prompt Opinion tool discovery shows the final 14 tools.
+
+## Gemini Configuration
+
+Only configure Gemini after fallback smoke passes.
+
+1. In Render service environment variables, set:
+   ```text
+   LLM_PROVIDER=gemini
+   LLM_MODEL=gemini-2.5-flash
+   ```
+2. Add `GEMINI_API_KEY` as a Render secret value only.
+3. Do not commit the key.
+4. Do not include the key in screenshots, docs, logs, prompts, or recordings.
+5. Redeploy the Render service.
+
+## Real LLM Validation
+
+Run:
+
+```bash
+python scripts/smoke_mcp.py --url https://follow-up-radar-mcp.onrender.com/mcp/ --expect-real-llm
+```
+
+Then call `generate_ai_follow_up_brief` for `synthetic-patient-003` and confirm:
+
+- `fallback_used: false`
+- `source: llm_generated_with_deterministic_guardrails`
+- `structured_findings` is still present
+- `priority` is still present
+- `audit_summary` is still present
+- `safety_validation.passed: true`
+
+## Demo Guardrails
+
+- Keep `FIXTURE_MODE=true`.
+- Keep `LIVE_FHIR_READS_ENABLED=false`.
+- Do not configure real FHIR credentials.
+- Do not claim a real EHR write occurred.
+- Do not claim another agent was contacted by the handoff payload.
