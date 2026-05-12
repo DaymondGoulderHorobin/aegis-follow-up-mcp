@@ -166,3 +166,7 @@ storage, access controls, monitoring, and reviewed EHR write workflows.
 - `docs/prompt_opinion_setup.md`
 - `docs/prompt_opinion_agent_instructions.md`
 - `docs/submission_copy.md`
+- `docs/final_code_review.md`
+- `docs/submission_readiness_checklist.md`
+- `docs/post_hackathon_roadmap.md`
+- `docs/risk_register.md`

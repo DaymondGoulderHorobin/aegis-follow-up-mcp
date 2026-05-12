@@ -2,7 +2,7 @@
 
 Goal: show a focused, judge-friendly flow that proves transparency, deterministic
 clinical logic, controlled AI synthesis, and handoff readiness without claiming
-live FHIR reads or EHR writes.
+live FHIR as the primary clinical workflow or claiming EHR writes.
 
 Target deployed MCP URL:
 
@@ -102,3 +102,13 @@ Gemini mode, only after Render secrets are configured:
 ```bash
 python scripts/smoke_mcp.py --url https://aegis-follow-up-mcp.onrender.com/mcp/ --expect-real-llm
 ```
+
+Optional FHIR proof mode, only when live FHIR context is configured and
+`LIVE_FHIR_READS_ENABLED=true`:
+
+```bash
+python scripts/smoke_mcp.py --url https://aegis-follow-up-mcp.onrender.com/mcp/ --expect-live-fhir --fhir-server-url https://example.fhir.test --fhir-access-token <token> --fhir-patient-id <patient-id>
+```
+
+The smoke script supports `--expect-live-fhir` for this proof. It does not expose a
+separate `--expect-fhir-connectivity` flag.
