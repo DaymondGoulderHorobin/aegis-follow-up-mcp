@@ -16,6 +16,9 @@ Primary 5-tool happy path:
 4. `generate_ai_follow_up_brief` for `synthetic-patient-003`
 5. `create_follow_up_handoff_payload` for `synthetic-patient-003`
 
+Start with this path. The remaining tools are available for deeper inspection, but
+judges do not need to explore every tool cold to evaluate the core submission.
+
 ## Expected Results
 
 - FHIR status reports `active_data_source: synthetic_fixture_data`.
@@ -75,3 +78,5 @@ configured operationally:
 ```bash
 python scripts/smoke_mcp.py --url https://aegis-follow-up-mcp.onrender.com/mcp/ --expect-live-fhir --fhir-server-url https://example.fhir.test --fhir-access-token <token> --fhir-patient-id <patient-id>
 ```
+
+The supported smoke flag for the optional proof is `--expect-live-fhir`.
