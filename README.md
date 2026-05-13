@@ -2,34 +2,41 @@
 
 ![Aegis Follow-Up logo](docs/assets/aegis-follow-up-logo.svg)
 
-Aegis Follow-Up is a clinician-review MCP safety layer that turns patient-context
-data into auditable follow-up tasks, controlled AI summaries, and handoff-ready
-payloads.
+Aegis Follow-Up is a Prompt Opinion-ready clinical operations assistant. It turns
+patient-context data into auditable follow-up tasks, controlled AI summaries, and
+handoff-ready payloads while keeping clinician review in control.
 
 Clinical decision support only. For clinician review. Not a diagnosis or treatment directive.
 
 The GitHub repository and Render service are now `aegis-follow-up-mcp`. The Python
 package name remains `follow-up-radar-mcp` for import and installation stability.
 
-## Hackathon Positioning
+## Current Status
 
-- Project: Agents Assemble Prompt Opinion Hackathon
-- Marketplace brand: `Aegis Follow-Up`
-- Stable deployed MCP endpoint: `https://aegis-follow-up-mcp.onrender.com/mcp/`
-- Transport: Streamable HTTP
-- Authentication: none for the synthetic-data hackathon demo
-- Data mode: synthetic FHIR fixtures by default
+- Product name: `Aegis Follow-Up`
+- Repository: `DaymondGoulderHorobin/aegis-follow-up-mcp`
+- Package name: `follow-up-radar-mcp`
 - Current version: `0.10.0`
+- MCP endpoint: `https://aegis-follow-up-mcp.onrender.com/mcp/`
+- Transport: Streamable HTTP
+- Default data mode: synthetic FHIR fixtures
+- Default LLM mode: deterministic fallback
+- Demo authentication: none for the synthetic public demo
 
-## Local Setup
+## Prompt Opinion
 
-```bash
-python -m venv .venv
-. .venv/bin/activate
-python -m pip install -e ".[dev]"
+Use the deployed MCP endpoint:
+
+```text
+https://aegis-follow-up-mcp.onrender.com/mcp/
 ```
 
-On Windows PowerShell:
+Prompt Opinion should discover 15 MCP tools and the optional
+`ai.promptopinion/fhir-context` capability extension. See
+`docs/prompt_opinion_setup.md` and `docs/judge_testing_guide.md` for the primary
+five-tool demo path.
+
+## Quickstart
 
 ```powershell
 python -m venv .venv
@@ -37,7 +44,15 @@ python -m venv .venv
 python -m pip install -e ".[dev]"
 ```
 
-## Run
+macOS/Linux:
+
+```bash
+python -m venv .venv
+. .venv/bin/activate
+python -m pip install -e ".[dev]"
+```
+
+## Run Locally
 
 ```bash
 uvicorn app.main:app --reload --port 8000
@@ -50,12 +65,24 @@ Then open:
 - `http://localhost:8000/version`
 - `http://localhost:8000/mcp/`
 
-## Validate
+## Validate Locally
 
 ```bash
 pytest
 ruff check .
 python scripts/smoke_mcp.py --url http://127.0.0.1:8000/mcp/
+```
+
+Remote fallback smoke:
+
+```bash
+python scripts/smoke_mcp.py --url https://aegis-follow-up-mcp.onrender.com/mcp/ --attempts 3 --delay-seconds 2 --timeout 30
+```
+
+Real Gemini smoke, only after Render secrets are configured:
+
+```bash
+python scripts/smoke_mcp.py --url https://aegis-follow-up-mcp.onrender.com/mcp/ --expect-real-llm
 ```
 
 ## MCP Tools
@@ -134,7 +161,27 @@ FHIR headers are present and whether the active source is `synthetic_fixture_dat
 - AI narrative output is optional, safety-validated, and backed by deterministic fallback.
 - Handoff payloads return `payload_only: true`, `required_human_review: true`, and `ehr_write_performed: false`.
 
-## Hackathon Scoring Notes
+See:
+
+- `CLINICAL_SAFETY.md`
+- `PRIVACY.md`
+- `SECURITY.md`
+- `PRODUCT_LIMITATIONS.md`
+- `docs/risk_register.md`
+
+## Environment Profiles
+
+Aegis Follow-Up uses explicit profile language for future work:
+
+- `local`: developer testing with synthetic fixtures.
+- `demo`: Prompt Opinion marketplace demo with synthetic fixtures.
+- `staging`: internal validation with managed secrets and read-only sandbox FHIR.
+- `pilot`: customer-approved read-only clinical pilot with authentication and PHI-safe logs.
+- `production`: future commercial posture, out of scope for this sprint.
+
+See `docs/environment_profiles.md`.
+
+## Product Foundation
 
 ### AI Factor
 
@@ -170,3 +217,14 @@ storage, access controls, monitoring, and reviewed EHR write workflows.
 - `docs/submission_readiness_checklist.md`
 - `docs/post_hackathon_roadmap.md`
 - `docs/risk_register.md`
+
+## Product Foundation Docs
+
+- `SECURITY.md`
+- `PRIVACY.md`
+- `CLINICAL_SAFETY.md`
+- `PRODUCT_LIMITATIONS.md`
+- `docs/environment_profiles.md`
+- `docs/production_readiness_checklist.md`
+- `docs/pilot_runbook.md`
+- `docs/codex_development_guide.md`
